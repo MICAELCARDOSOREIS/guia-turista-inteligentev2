@@ -86,6 +86,7 @@ def buscar_coordenadas(
                 "language": "pt",
                 "format": "json",
                 "countryCode": "BR",
+                "country_codes": "BR",
             },
             timeout=4.0,
         )
@@ -161,7 +162,7 @@ def obter_percurso(
     Em caso de trajetos sem estradas (ex: ilhas) ou timeout (6.0s),
     retorna dicionário com fallback descritivo ('Sem rota direta' / 'Considere voos ou barcos').
     """
-    if lat_o == 0.0 and lon_o == 0.0 and lat_d == 0.0 and lon_d == 0.0:
+    if (lat_o == 0.0 and lon_o == 0.0) or (lat_d == 0.0 and lon_d == 0.0):
         return {"distancia": "Sem rota direta", "tempo": "Considere voos ou barcos"}
 
     url = (
