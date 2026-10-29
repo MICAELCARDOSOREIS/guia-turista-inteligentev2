@@ -1,0 +1,27 @@
+# Ambientes virtuais e Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+**/*.pyc
+**/__pycache__/
+*.tmp
+
+# Node e Front-end
+node_modules/
+**/node_modules/
+dist/
+frontend/dist/
+.vite/
+frontend/.vite/
+
+# Variáveis de ambiente sensíveis
+.env
+backend/.env
+frontend/.env
+
+# Superpowers e logs
+.superpowers/sdd/
+.DS_Store
+*.log
