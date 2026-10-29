@@ -8,48 +8,21 @@ export default function RoteiroResult({
 }) {
   if (!roteiro) return null;
 
-  const { clima, atrativos_sugeridos, gastronomia_sugerida, atrativos_visitados, guia } = roteiro;
+  const { atrativos_sugeridos, gastronomia_sugerida, atrativos_visitados, guia } = roteiro;
   const visitadosSet = new Set(atrativos_visitados || []);
   const textoExibicao = textoGuiaStream || guia;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginTop: '1.25rem' }}>
-      {/* Condição Climática no Destino */}
-      {clima && (
-        <div
-          className="card"
-          style={{
-            background:
-              'linear-gradient(125deg, rgba(224, 159, 62, 0.14) 0%, rgba(46, 196, 182, 0.1) 100%)',
-            borderColor: 'var(--border-strong)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                 Boletim Meteorológico no Destino ({roteiro.destino})
-              </span>
-              <h3 className="font-display" style={{ fontSize: '1.35rem', fontWeight: 700, margin: '0.2rem 0' }}>
-                {clima.temperatura}°C — {clima.condicao}
-              </h3>
-              <p className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                Sensação: {clima.sensacao_termica}°C • Umidade: {clima.umidade}% • Vento: {clima.velocidade_vento} km/h
-              </p>
-            </div>
-            <span className="badge badge-info">Open-Meteo Live</span>
-          </div>
-        </div>
-      )}
-
-      {/* Caderno de Campo — Guia em Streaming SSE */}
-      <div className="card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.9rem' }}>
+    <>
+      {/* 4. BLOCO ESQUERDO INFERIOR (7 colunas): Caderno de Campo em Streaming SSE */}
+      <div className="card bento-span-7" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <h3 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+            <h3 className="font-display" style={{ fontSize: '1.2rem', fontWeight: 700 }}>
               Caderno de Campo & Roteiro Cultural
             </h3>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Narrativa gerada sob medida para {roteiro.destino}
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              Itinerário narrativo transmitido em tempo real para {roteiro.destino}
             </span>
           </div>
           {streamingGuia ? (
@@ -80,79 +53,91 @@ export default function RoteiroResult({
         </div>
       </div>
 
-      {/* Catálogo de Atrativos & Gastronomia com Passaporte de Visitas */}
-      {atrativos_sugeridos && atrativos_sugeridos.length > 0 && (
-        <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.9rem' }}>
+      {/* 5. BLOCO DIREITO INFERIOR (5 colunas): Passaporte de Visitas + Gastronomia em Grade */}
+      <div className="card bento-span-5" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1rem' }}>
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.75rem' }}>
             <h3 className="font-display" style={{ fontSize: '1.15rem', fontWeight: 700 }}>
-              Pontos de Interesse & Passaporte de Visitas
+              Passaporte de Atrativos
             </h3>
-            <span className="font-mono" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              {visitadosSet.size} de {atrativos_sugeridos.length} visitados
+            <span className="font-mono" style={{ fontSize: '0.75rem', color: 'var(--accent-secondary)' }}>
+              {visitadosSet.size}/{atrativos_sugeridos?.length || 0} visitados
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '0.75rem' }}>
-            {atrativos_sugeridos.map((atrativo) => {
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.6rem' }}>
+            {atrativos_sugeridos?.map((atrativo) => {
               const visitado = visitadosSet.has(atrativo);
               return (
-                <div
+                <button
                   key={atrativo}
+                  type="button"
+                  onClick={() => onAlternarVisita(atrativo, !visitado)}
                   style={{
                     background: visitado ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
                     border: `1px solid ${visitado ? 'var(--accent-secondary)' : 'var(--border-color)'}`,
                     borderRadius: 'var(--radius-sm)',
-                    padding: '0.8rem 0.95rem',
+                    padding: '0.7rem 0.75rem',
                     display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '0.6rem',
+                    gap: '0.45rem',
+                    textAlign: 'left',
+                    minHeight: '78px',
                   }}
                 >
                   <span
                     style={{
-                      fontSize: '0.9rem',
-                      fontWeight: visitado ? 600 : 500,
+                      fontSize: '0.84rem',
+                      fontWeight: 600,
                       color: visitado ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                      lineHeight: 1.25,
                     }}
                   >
                     {atrativo}
                   </span>
-                  <button
-                    type="button"
-                    className="btn-outline"
+                  <span
+                    className="font-mono"
                     style={{
-                      fontSize: '0.75rem',
-                      padding: '0.3rem 0.65rem',
-                      background: visitado ? 'var(--accent-secondary)' : 'transparent',
-                      color: visitado ? '#071318' : 'var(--text-primary)',
-                      borderColor: visitado ? 'var(--accent-secondary)' : 'var(--border-strong)',
+                      fontSize: '0.68rem',
+                      color: visitado ? 'var(--accent-secondary)' : 'var(--text-muted)',
                     }}
-                    onClick={() => onAlternarVisita(atrativo, !visitado)}
                   >
-                    {visitado ? '✓ Visitado' : 'Marcar visita'}
-                  </button>
-                </div>
+                    {visitado ? '✓ CARIMBADO' : '+ CARIMBAR VISITA'}
+                  </span>
+                </button>
               );
             })}
           </div>
-
-          {gastronomia_sugerida && gastronomia_sugerida.length > 0 && (
-            <div style={{ marginTop: '1.15rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.9rem' }}>
-              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Gastronomia regional recomendada:
-              </span>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', marginTop: '0.5rem' }}>
-                {gastronomia_sugerida.map((prato) => (
-                  <span key={prato} className="badge badge-info">
-                    {prato}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
-      )}
-    </div>
+
+        {gastronomia_sugerida && gastronomia_sugerida.length > 0 && (
+          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem' }}>
+            <span style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.45rem' }}>
+              Sabores Regionais Indispensáveis
+            </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.45rem' }}>
+              {gastronomia_sugerida.map((prato) => (
+                <div
+                  key={prato}
+                  style={{
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: 'var(--radius-xs)',
+                    padding: '0.45rem 0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    color: 'var(--accent-primary)',
+                  }}
+                >
+                  {prato}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -42,7 +42,6 @@ export default function App() {
     alternarVisitaAtrativo,
   } = useViagem(usuario?.user_id, addToast);
 
-  // Listener para evento customizado de simulação de Google Login
   useEffect(() => {
     const handleGoogleMock = (e) => {
       loginGoogleSucesso(e.detail);
@@ -90,8 +89,8 @@ export default function App() {
         )}
 
         <main className="container app-main">
-          {/* Coluna Esquerda: Formulário de Parâmetros e Histórico */}
-          <aside style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Painel Lateral Fixo (Cockpit de Comando) */}
+          <aside className="cockpit-sidebar">
             <RoteiroForm onSubmit={planejarViagem} carregando={carregando} />
             <HistoricoViagens
               viagens={viagensSalvas}
@@ -104,16 +103,20 @@ export default function App() {
             />
           </aside>
 
-          {/* Coluna Direita: Mapa Leaflet, Telemetria e Resultados */}
-          <section style={{ display: 'flex', flexDirection: 'column' }}>
-            <MapaRota roteiro={roteiroAtual} userId={usuario?.user_id} />
-            <TelemetriaCard telemetria={telemetria} />
+          {/* Mosaico Bento Grid (Sem empilhamento vertical em lista) */}
+          <section className="bento-workspace">
+            <MapaRota
+              roteiro={roteiroAtual}
+              userId={usuario?.user_id}
+              telemetria={telemetria}
+            />
             <RoteiroResult
               roteiro={roteiroAtual}
               textoGuiaStream={textoGuiaStream}
               streamingGuia={streamingGuia}
               onAlternarVisita={alternarVisitaAtrativo}
             />
+            <TelemetriaCard telemetria={telemetria} />
           </section>
         </main>
 
