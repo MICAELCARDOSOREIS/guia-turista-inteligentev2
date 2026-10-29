@@ -12,7 +12,7 @@ export default function BotoesControleViagem({ roteiro }) {
   };
 
   const handleCompartilharWhatsApp = () => {
-    const texto = `Roteiro de Viagem — Guia do Turista Brasil\nDe: ${roteiro.origem}\nPara: ${roteiro.destino}\nDistância: ${roteiro.rota?.distancia_km} km (${roteiro.rota?.duracao_formatada})\nCusto Estimado: R$ ${roteiro.custos?.custo_total?.toFixed(2)}\nClima: ${roteiro.clima?.temperatura}°C (${roteiro.clima?.condicao})`;
+    const texto = `Roteiro de Viagem — Guia do Turista\nDe: ${roteiro.origem}\nPara: ${roteiro.destino}\nDistância: ${roteiro.rota?.distancia_km} km (${roteiro.rota?.duracao_formatada})\nCusto Estimado: R$ ${roteiro.custos?.custo_total?.toFixed(2)}\nClima: ${roteiro.clima?.temperatura}°C (${roteiro.clima?.condicao})`;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -28,15 +28,30 @@ export default function BotoesControleViagem({ roteiro }) {
   };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-      <button type="button" onClick={handleAbrirGoogleMaps} className="btn-utility">
+    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+      <button
+        type="button"
+        onClick={handleAbrirGoogleMaps}
+        className="btn-ghost"
+        style={{ height: 28, padding: '0 0.6rem', fontSize: '0.74rem' }}
+      >
         Google Maps
       </button>
-      <button type="button" onClick={handleCompartilharWhatsApp} className="btn-utility">
+      <button
+        type="button"
+        onClick={handleCompartilharWhatsApp}
+        className="btn-ghost"
+        style={{ height: 28, padding: '0 0.6rem', fontSize: '0.74rem' }}
+      >
         WhatsApp
       </button>
-      <button type="button" onClick={handleDownloadGPX} className="btn-utility">
-        Exportar GPX 1.1
+      <button
+        type="button"
+        onClick={handleDownloadGPX}
+        className="btn-ghost"
+        style={{ height: 28, padding: '0 0.6rem', fontSize: '0.74rem', color: 'var(--brand-primary)', borderColor: 'var(--brand-border)' }}
+      >
+        GPX 1.1
       </button>
     </div>
   );

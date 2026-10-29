@@ -38,6 +38,13 @@ export default function RoteiroForm({ onSubmit, carregando }) {
     }
   };
 
+  const handleInverterRota = () => {
+    setOrigemCidade(destinoCidade);
+    setOrigemUf(destinoUf);
+    setDestinoCidade(origemCidade);
+    setDestinoUf(origemUf);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (carregando) return;
@@ -57,45 +64,62 @@ export default function RoteiroForm({ onSubmit, carregando }) {
     });
   };
 
-  const handleSelecionarDestinoSugerido = (dest) => {
-    setDestinoCidade(dest.cidade);
-    setDestinoUf(dest.uf);
-  };
-
   const autonomiaNominalKm = Math.round((parseFloat(consumoMedio) || 0) * (parseFloat(capacidade) || 0));
   const autonomiaSeguraKm = Math.round(autonomiaNominalKm * 0.82);
 
   return (
-    <div className="sidebar-section">
-      <div className="section-heading">
-        <span>Parâmetros do Trecho</span>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+        <div>
+          <h2 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-main)' }}>
+            Planejador de Rota
+          </h2>
+          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
+            Configure origem, destino e veículo
+          </p>
+        </div>
         <button
           type="button"
           onClick={handleDetectarGps}
-          className="btn-utility"
+          className="btn-ghost"
           disabled={buscandoGps}
-          style={{ minHeight: 28, padding: '0.2rem 0.55rem', fontSize: '0.74rem' }}
+          style={{ height: 30, padding: '0 0.6rem', fontSize: '0.74rem' }}
         >
-          {buscandoGps ? 'Localizando…' : 'Proximidade GPS'}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v3m0 14v3M2 12h3m14 0h3" />
+          </svg>
+          <span>{buscandoGps ? 'Buscando…' : 'Destinos próximos'}</span>
         </button>
       </div>
 
       {destinosProximos.length > 0 && (
-        <div style={{ marginBottom: '0.9rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--line-hairline)' }}>
-          <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
-            Raio geodésico (Haversine):
+        <div
+          style={{
+            marginBottom: '0.9rem',
+            padding: '0.65rem',
+            background: 'var(--bg-subtle)',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
+            Sugestões por proximidade (Haversine):
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
             {destinosProximos.map((d) => (
               <button
                 key={d.cidade}
                 type="button"
-                className="btn-utility font-mono"
-                style={{ fontSize: '0.72rem', minHeight: 28, padding: '0.2rem 0.5rem' }}
-                onClick={() => handleSelecionarDestinoSugerido(d)}
+                className="btn-ghost font-mono"
+                style={{ height: 26, padding: '0 0.5rem', fontSize: '0.72rem' }}
+                onClick={() => {
+                  setDestinoCidade(d.cidade);
+                  setDestinoUf(d.uf);
+                }}
               >
                 <span>{d.cidade}-{d.uf}</span>
-                <span style={{ color: 'var(--accent-ochre)' }}>{d.distancia_km} km</span>
+                <span style={{ color: 'var(--brand-primary)' }}>{d.distancia_km}km</span>
               </button>
             ))}
           </div>
@@ -103,87 +127,108 @@ export default function RoteiroForm({ onSubmit, carregando }) {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="field-row" style={{ gridTemplateColumns: '1fr 74px' }}>
-          <div>
-            <label htmlFor="origemCidade" className="field-label">Município de Origem</label>
-            <input
-              id="origemCidade"
-              type="text"
-              className="field-input"
-              value={origemCidade}
-              onChange={(e) => setOrigemCidade(e.target.value)}
-              required
-            />
+        {/* Bloco Unificado de Origem e Destino com Botão de Inverter */}
+        <div className="route-inputs-card">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 68px', gap: '0.5rem', marginBottom: '0.65rem' }}>
+            <div>
+              <label htmlFor="origemCidade" className="field-label">Município de Origem</label>
+              <input
+                id="origemCidade"
+                type="text"
+                className="field-input"
+                value={origemCidade}
+                onChange={(e) => setOrigemCidade(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="origemUf" className="field-label">UF de Origem</label>
+              <input
+                id="origemUf"
+                type="text"
+                maxLength={2}
+                className="field-input font-mono"
+                value={origemUf}
+                onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="origemUf" className="field-label">UF de Origem</label>
-            <input
-              id="origemUf"
-              type="text"
-              maxLength={2}
-              className="field-input font-mono"
-              value={origemUf}
-              onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
-              required
-            />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0.25rem 0 0.5rem' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+            <button
+              type="button"
+              onClick={handleInverterRota}
+              className="btn-ghost"
+              style={{ height: 24, padding: '0 0.5rem', fontSize: '0.7rem' }}
+              title="Inverter origem e destino"
+            >
+              ⇅ Inverter
+            </button>
+            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 68px', gap: '0.5rem' }}>
+            <div>
+              <label htmlFor="destinoCidade" className="field-label">Município de Destino</label>
+              <input
+                id="destinoCidade"
+                type="text"
+                className="field-input"
+                value={destinoCidade}
+                onChange={(e) => setDestinoCidade(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="destinoUf" className="field-label">UF de Destino</label>
+              <input
+                id="destinoUf"
+                type="text"
+                maxLength={2}
+                className="field-input font-mono"
+                value={destinoUf}
+                onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <div className="field-row" style={{ gridTemplateColumns: '1fr 74px' }}>
-          <div>
-            <label htmlFor="destinoCidade" className="field-label">Município de Destino</label>
-            <input
-              id="destinoCidade"
-              type="text"
-              className="field-input"
-              value={destinoCidade}
-              onChange={(e) => setDestinoCidade(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="destinoUf" className="field-label">UF de Destino</label>
-            <input
-              id="destinoUf"
-              type="text"
-              maxLength={2}
-              className="field-input font-mono"
-              value={destinoUf}
-              onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
-              required
-            />
+        {/* Seletor de Propulsão */}
+        <div className="field-group">
+          <label className="field-label">Motorização</label>
+          <div className="segmented-pill" role="group" aria-label="Tipo de Propulsão">
+            <button
+              type="button"
+              className={`segmented-item ${tipoPropulsao === 'combustao' ? 'active' : ''}`}
+              onClick={() => {
+                setTipoPropulsao('combustao');
+                setConsumoMedio(12.0);
+                setCapacidade(50.0);
+                setPrecoUnidade(5.89);
+              }}
+            >
+              Combustão
+            </button>
+            <button
+              type="button"
+              className={`segmented-item ${tipoPropulsao === 'ev' ? 'active' : ''}`}
+              onClick={() => {
+                setTipoPropulsao('ev');
+                setConsumoMedio(6.5);
+                setCapacidade(60.0);
+                setPrecoUnidade(0.95);
+              }}
+            >
+              100% Elétrico (EV)
+            </button>
           </div>
         </div>
 
-        <div className="field-label" style={{ marginTop: '0.85rem' }}>Propulsão</div>
-        <div className="segmented-control" role="group" aria-label="Tipo de Propulsão">
-          <button
-            type="button"
-            className={`segmented-btn ${tipoPropulsao === 'combustao' ? 'is-active' : ''}`}
-            onClick={() => {
-              setTipoPropulsao('combustao');
-              setConsumoMedio(12.0);
-              setCapacidade(50.0);
-              setPrecoUnidade(5.89);
-            }}
-          >
-            Combustão
-          </button>
-          <button
-            type="button"
-            className={`segmented-btn ${tipoPropulsao === 'ev' ? 'is-active' : ''}`}
-            onClick={() => {
-              setTipoPropulsao('ev');
-              setConsumoMedio(6.5);
-              setCapacidade(60.0);
-              setPrecoUnidade(0.95);
-            }}
-          >
-            100% Elétrico (EV)
-          </button>
-        </div>
-
-        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        {/* Eficiência e Tanque */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '0.65rem' }}>
           <div>
             <label htmlFor="consumoMedio" className="field-label">
               {tipoPropulsao === 'ev' ? 'Eficiência (km/kWh)' : 'Consumo (km/l)'}
@@ -218,24 +263,28 @@ export default function RoteiroForm({ onSubmit, carregando }) {
           </div>
         </div>
 
+        {/* Barra de Autonomia Segura */}
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            fontSize: '0.78rem',
-            padding: '0.45rem 0',
-            marginBottom: '0.65rem',
-            borderTop: '1px solid var(--line-hairline)',
-            borderBottom: '1px solid var(--line-hairline)',
+            alignItems: 'center',
+            padding: '0.5rem 0.75rem',
+            background: 'var(--brand-light)',
+            border: '1px solid var(--brand-border)',
+            borderRadius: 'var(--radius-sm)',
+            marginBottom: '0.85rem',
+            fontSize: '0.76rem',
           }}
         >
-          <span style={{ color: 'var(--text-secondary)' }}>Alcance útil (reserva 18%)</span>
-          <span className="font-mono" style={{ fontWeight: 600 }}>
-            {autonomiaSeguraKm} km / {autonomiaNominalKm} km
+          <span style={{ color: 'var(--brand-primary)', fontWeight: 600 }}>Autonomia segura (-18%)</span>
+          <span className="font-mono" style={{ fontWeight: 700, color: 'var(--brand-primary)' }}>
+            {autonomiaSeguraKm} km <span style={{ opacity: 0.7, fontWeight: 500 }}>/ {autonomiaNominalKm} km</span>
           </span>
         </div>
 
-        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        {/* Estadia e Estilo */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem', marginBottom: '1rem' }}>
           <div>
             <label htmlFor="diasEstadia" className="field-label">Estadia</label>
             <select
@@ -252,7 +301,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
             </select>
           </div>
           <div>
-            <label htmlFor="estiloViagem" className="field-label">Foco</label>
+            <label htmlFor="estiloViagem" className="field-label">Perfil</label>
             <select
               id="estiloViagem"
               className="field-select"
@@ -268,13 +317,8 @@ export default function RoteiroForm({ onSubmit, carregando }) {
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="btn-action"
-          disabled={carregando}
-          style={{ marginTop: '0.35rem' }}
-        >
-          {carregando ? 'Processando rota e relevo…' : 'Calcular Rota e Roteiro'}
+        <button type="submit" className="btn-brand" disabled={carregando}>
+          {carregando ? 'Processando rota e relevo…' : 'Planejar Viagem'}
         </button>
       </form>
     </div>

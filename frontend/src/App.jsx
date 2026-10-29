@@ -45,7 +45,7 @@ export default function App() {
   useEffect(() => {
     const handleGoogleMock = (e) => {
       loginGoogleSucesso(e.detail);
-      addToast(`Sessão iniciada: ${e.detail.nome}`, 'success');
+      addToast(`Sessão iniciada como ${e.detail.nome}`, 'success');
     };
     window.addEventListener('login_google_mock', handleGoogleMock);
     return () => window.removeEventListener('login_google_mock', handleGoogleMock);
@@ -53,7 +53,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className="workbench-shell">
+      <div className="app-shell">
         <Header
           usuario={usuario}
           googleSalvo={googleSalvo}
@@ -84,25 +84,27 @@ export default function App() {
               fontWeight: 600,
             }}
           >
-            Conexão offline: operando em contingência local.
+            Modo offline ativo — operando com dados de contingência local.
           </div>
         )}
 
-        <main className="workbench-grid">
-          <aside className="workbench-sidebar">
+        <main className="saas-workspace">
+          {/* Painel Lateral Fixo estilo App SaaS */}
+          <aside className="planner-sidebar">
             <RoteiroForm onSubmit={planejarViagem} carregando={carregando} />
             <HistoricoViagens
               viagens={viagensSalvas}
               roteiroAtual={roteiroAtual}
               onSelecionar={(v) => {
                 setRoteiroAtual(v);
-                addToast(`Rota aberta: ${v.destino}`, 'info');
+                addToast(`Roteiro aberto: ${v.destino}`, 'info');
               }}
               onExcluir={excluirViagem}
             />
           </aside>
 
-          <section className="workbench-canvas">
+          {/* Palco Principal: Mapa Interativo + Analytics + Roteiro */}
+          <section className="main-stage">
             <MapaRota roteiro={roteiroAtual} userId={usuario?.user_id} />
             <RoteiroResult
               roteiro={roteiroAtual}
@@ -110,11 +112,11 @@ export default function App() {
               streamingGuia={streamingGuia}
               onAlternarVisita={alternarVisitaAtrativo}
             />
+            <TelemetriaCard telemetria={telemetria} />
+            <Footer />
           </section>
         </main>
 
-        <TelemetriaCard telemetria={telemetria} />
-        <Footer />
         <Toast toasts={toasts} onRemove={removeToast} />
       </div>
     </ErrorBoundary>

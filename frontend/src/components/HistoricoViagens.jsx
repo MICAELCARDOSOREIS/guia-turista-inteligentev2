@@ -8,68 +8,78 @@ export default function HistoricoViagens({
 }) {
   if (!viagens || viagens.length === 0) {
     return (
-      <div className="sidebar-section">
-        <div className="section-heading" style={{ marginBottom: '0.35rem' }}>
-          <span>Histórico da Sessão</span>
-        </div>
-        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          Nenhuma rota registrada nesta sessão.
+      <div
+        style={{
+          padding: '0.9rem',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--bg-subtle)',
+          border: '1px dashed var(--border-focus)',
+          textAlign: 'center',
+        }}
+      >
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+          Suas viagens salvas aparecerão aqui para acesso rápido.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="sidebar-section">
-      <div className="section-heading">
-        <span>Histórico da Sessão</span>
-        <span className="font-mono">{viagens.length}</span>
+    <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+          Viagens Recentes
+        </span>
+        <span className="saas-brand-badge font-mono">{viagens.length}</span>
       </div>
 
-      <table className="ledger-table">
-        <tbody>
-          {viagens.map((v) => {
-            const selecionado = roteiroAtual?.id === v.id;
-            return (
-              <tr
-                key={v.id}
-                onClick={() => onSelecionar(v)}
-                style={{
-                  cursor: 'pointer',
-                  background: selecionado ? 'var(--bg-active)' : 'transparent',
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+        {viagens.map((v) => {
+          const selecionado = roteiroAtual?.id === v.id;
+          return (
+            <div
+              key={v.id}
+              onClick={() => onSelecionar(v)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.6rem 0.75rem',
+                borderRadius: 'var(--radius-sm)',
+                background: selecionado ? 'var(--brand-light)' : 'var(--bg-subtle)',
+                border: `1px solid ${selecionado ? 'var(--brand-border)' : 'var(--border-subtle)'}`,
+                cursor: 'pointer',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                  {v.origem?.split('-')[0]?.trim()} → {v.destino?.split('-')[0]?.trim()}
+                </div>
+                <div className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                  {v.rota?.distancia_km} km • R$ {v.custos?.custo_total?.toFixed(0)}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onExcluir(v.id);
                 }}
+                style={{
+                  color: 'var(--text-muted)',
+                  fontSize: '1rem',
+                  padding: '0.1rem 0.35rem',
+                }}
+                title="Excluir viagem"
+                aria-label={`Excluir viagem para ${v.destino}`}
               >
-                <td style={{ padding: '0.5rem 0.35rem' }}>
-                  <div style={{ fontWeight: selecionado ? 700 : 500, fontSize: '0.84rem' }}>
-                    {v.origem?.split('-')[0]?.trim()} → {v.destino?.split('-')[0]?.trim()}
-                  </div>
-                  <div className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                    {v.rota?.distancia_km} km • R$ {v.custos?.custo_total?.toFixed(0)}
-                  </div>
-                </td>
-                <td style={{ padding: '0.5rem 0.35rem', width: 32 }}>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onExcluir(v.id);
-                    }}
-                    style={{
-                      color: 'var(--text-muted)',
-                      fontSize: '0.9rem',
-                      padding: '0.1rem 0.35rem',
-                    }}
-                    title="Remover rota"
-                    aria-label={`Excluir viagem para ${v.destino}`}
-                  >
-                    ×
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                ×
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

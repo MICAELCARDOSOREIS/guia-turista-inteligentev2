@@ -1,53 +1,62 @@
 /* ==========================================================================
-   Design System — "OPERATE / APP UI: Mesa Cartográfica & Painel Rodoviário"
-   Auditado contra gstack-design-review (Zero AI Slop, Sem Mosaico de Cards)
+   Guia do Turista Brasil — SaaS Product & Split-Screen Map Application UI
+   Inspirado em Airbnb Trips, Wanderlog, Stripe & Apple Maps
    ========================================================================== */
 
 :root {
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-  --radius-xs: 4px;
-  --radius-sm: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
 }
 
-/* Tema Padrão Claro: Papel de Engenharia / Mesa Cartográfica */
 :root,
 [data-theme="light"] {
   color-scheme: light;
-  --bg-canvas: #F3EFE6;
-  --bg-surface: #FAF7F0;
-  --bg-recessed: #EAE4D7;
-  --bg-active: #E1D9C8;
-  --line-hairline: #D4CBB8;
-  --line-strong: #B5A992;
-  --text-primary: #18221F;
-  --text-secondary: #485651;
-  --text-muted: #707E78;
-  --accent-primary: #1B5E4A;
-  --accent-primary-hover: #134636;
-  --accent-primary-fg: #FFFFFF;
-  --accent-ochre: #B85D19;
-  --accent-danger: #B42318;
+  --bg-app: #F8FAFC;
+  --bg-panel: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --bg-hover: #E2E8F0;
+  --border-subtle: #E2E8F0;
+  --border-focus: #CBD5E1;
+  --text-main: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --brand-primary: #0F766E;
+  --brand-primary-hover: #115E59;
+  --brand-light: #F0FDFA;
+  --brand-border: #99F6E4;
+  --accent-amber: #D97706;
+  --accent-amber-bg: #FFFBEB;
+  --accent-danger: #E11D48;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --shadow-float: 0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
 }
 
-/* Tema Noturno: Cabine Automotiva Fosca (Zero Neon / Zero Glow) */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg-canvas: #111615;
-  --bg-surface: #171E1C;
-  --bg-recessed: #0C100F;
-  --bg-active: #202926;
-  --line-hairline: #26312E;
-  --line-strong: #384742;
-  --text-primary: #EAE6DF;
-  --text-secondary: #9BA8A3;
-  --text-muted: #687570;
-  --accent-primary: #3A9E7E;
-  --accent-primary-hover: #4BB392;
-  --accent-primary-fg: #0C100F;
-  --accent-ochre: #D9823B;
-  --accent-danger: #E05347;
+  --bg-app: #090D16;
+  --bg-panel: #111827;
+  --bg-subtle: #1E293B;
+  --bg-hover: #334155;
+  --border-subtle: #1F2937;
+  --border-focus: #374151;
+  --text-main: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --brand-primary: #14B8A6;
+  --brand-primary-hover: #0D9488;
+  --brand-light: rgba(20, 184, 166, 0.12);
+  --brand-border: rgba(20, 184, 166, 0.3);
+  --accent-amber: #F59E0B;
+  --accent-amber-bg: rgba(245, 158, 11, 0.12);
+  --accent-danger: #F43F5E;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 16px 36px rgba(0, 0, 0, 0.55);
 }
 
 * {
@@ -56,18 +65,12 @@
   padding: 0;
 }
 
-::selection {
-  background: var(--accent-primary);
-  color: var(--accent-primary-fg);
-}
-
 body {
   font-family: var(--font-sans);
-  font-size: 16px;
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
+  font-size: 15px;
+  background-color: var(--bg-app);
+  color: var(--text-main);
   line-height: 1.5;
-  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -81,22 +84,16 @@ select {
 
 button {
   cursor: pointer;
-  background: none;
   border: none;
-  transition: background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+  background: none;
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--brand-primary);
   outline-offset: 2px;
-}
-
-.font-display {
-  font-family: var(--font-display);
-  letter-spacing: -0.015em;
-  text-wrap: balance;
 }
 
 .font-mono {
@@ -105,417 +102,405 @@ select:focus-visible {
 }
 
 /* ==========================================================================
-   Estrutura Arquitetural (App UI Workbench — Zero Cartões Soltos)
+   Navbar Superior de Produto SaaS (58px)
    ========================================================================== */
-.workbench-shell {
+.app-shell {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 1600px;
-  margin: 0 auto;
-  border-left: 1px solid var(--line-hairline);
-  border-right: 1px solid var(--line-hairline);
-  background: var(--bg-surface);
 }
 
-/* Barra Superior Técnica */
-.topbar {
+.saas-navbar {
+  height: 60px;
+  padding: 0 1.5rem;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0.75rem 1.5rem;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--line-strong);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.topbar-brand {
-  display: flex;
-  align-items: baseline;
-  gap: 0.85rem;
-}
-
-.highway-code {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.18rem 0.48rem;
-  background: var(--text-primary);
-  color: var(--bg-surface);
-  border-radius: 3px;
-}
-
-.topbar-title {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.topbar-meta {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-}
-
-.topbar-controls {
+.saas-brand {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
-/* Grade Principal do Workbench: Painel Esquerdo Fixo + Painel Direito Contínuo */
-.workbench-grid {
+.saas-logo-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--brand-primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-xs);
+}
+
+.saas-brand-title {
+  font-weight: 700;
+  font-size: 1.02rem;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+.saas-brand-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--brand-light);
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-border);
+}
+
+.saas-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ==========================================================================
+   Workspace Split-Screen: Painel de Controle & Roteiro + Mapa Fixo
+   ========================================================================== */
+.saas-workspace {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr;
+  max-width: 1680px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-@media (min-width: 1040px) {
-  .workbench-grid {
-    grid-template-columns: 360px minmax(0, 1fr);
+@media (min-width: 1080px) {
+  .saas-workspace {
+    grid-template-columns: 400px minmax(0, 1fr);
+    min-height: calc(100vh - 60px);
   }
 }
 
-.workbench-sidebar {
-  border-right: 1px solid var(--line-strong);
-  background: var(--bg-surface);
+/* Coluna Esquerda: Planejador & Rotas Salvas */
+.planner-sidebar {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-subtle);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
 }
 
-.sidebar-section {
-  padding: 1.25rem 1.35rem;
-  border-bottom: 1px solid var(--line-hairline);
+@media (min-width: 1080px) {
+  .planner-sidebar {
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+    overflow-y: auto;
+  }
 }
 
-.section-heading {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 0.85rem;
+/* Coluna Direita: Dashboard do Mapa + Abas de Conteúdo */
+.main-stage {
+  padding: 1.25rem 1.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: var(--bg-app);
 }
 
-/* Controles de Formulário */
-.field-row {
-  display: grid;
-  gap: 0.5rem;
+/* Superfície Padrão de Produto */
+.surface-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ==========================================================================
+   Formulário de Planejamento estilo App de Viagem
+   ========================================================================== */
+.route-inputs-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.field-group {
   margin-bottom: 0.75rem;
+}
+
+.field-group:last-child {
+  margin-bottom: 0;
 }
 
 .field-label {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.3rem;
 }
 
 .field-input,
 .field-select {
   width: 100%;
-  min-height: 40px;
-  padding: 0.45rem 0.7rem;
-  background: var(--bg-canvas);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-xs);
-  font-size: 0.92rem;
-  color: var(--text-primary);
+  height: 38px;
+  padding: 0 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.field-input:hover,
+.field-select:hover {
+  border-color: var(--border-focus);
 }
 
 .field-input:focus,
 .field-select:focus {
-  border-color: var(--accent-primary);
-  background: var(--bg-surface);
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-light);
+  outline: none;
 }
 
-.segmented-control {
+/* Segmented Control (Pílula de Seleção) */
+.segmented-pill {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: var(--bg-recessed);
+  background: var(--bg-subtle);
   padding: 3px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--line-hairline);
-  margin-bottom: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
 }
 
-.segmented-btn {
-  min-height: 36px;
+.segmented-item {
+  height: 34px;
+  border-radius: 6px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-secondary);
-  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
-.segmented-btn.is-active {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  border: 1px solid var(--line-strong);
+.segmented-item.active {
+  background: var(--bg-panel);
+  color: var(--text-main);
+  box-shadow: var(--shadow-xs);
 }
 
-.btn-action {
+/* Botões de Produto */
+.btn-brand {
   width: 100%;
-  min-height: 44px;
-  padding: 0.65rem 1rem;
-  background: var(--accent-primary);
-  color: var(--accent-primary-fg);
+  height: 44px;
+  background: var(--brand-primary);
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.92rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-xs);
 }
 
-.btn-action:hover:not(:disabled) {
-  background: var(--accent-primary-hover);
+.btn-brand:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-action:disabled {
-  opacity: 0.55;
+.btn-brand:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.btn-utility {
-  min-height: 34px;
-  padding: 0.35rem 0.75rem;
-  background: var(--bg-canvas);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-xs);
+.btn-ghost {
+  height: 34px;
+  padding: 0 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
-.btn-utility:hover:not(:disabled) {
-  background: var(--bg-active);
-}
-
-.status-tag {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  padding: 0.2rem 0.55rem;
-  background: var(--bg-recessed);
-  border: 1px solid var(--line-hairline);
-  border-radius: var(--radius-xs);
-  color: var(--text-secondary);
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  border-color: var(--border-focus);
 }
 
 /* ==========================================================================
-   Área Direita: Mesa Cartográfica & Tabelas Técnicas
+   Mapa Principal com HUD Flutuante (Estilo Apple Maps / Uber)
    ========================================================================== */
-.workbench-canvas {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-surface);
+.map-stage-wrapper {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-panel);
 }
 
-/* Faixa de Cabeçalho da Rota e Métricas Divididas por Fios (Hairlines) */
-.route-header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1.15rem 1.5rem;
-  border-bottom: 1px solid var(--line-hairline);
-}
-
-.metrics-ledger {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-bottom: 1px solid var(--line-strong);
-  background: var(--bg-canvas);
-}
-
-@media (max-width: 768px) {
-  .metrics-ledger {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.ledger-cell {
-  padding: 0.85rem 1.5rem;
-  border-right: 1px solid var(--line-hairline);
-}
-
-.ledger-cell:last-child {
-  border-right: none;
-}
-
-.ledger-label {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.15rem;
-}
-
-.ledger-value {
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-/* Divisão Mapa (Esquerda) + Especificações de Altimetria e Custos (Direita) */
-.canvas-split-top {
-  display: grid;
-  grid-template-columns: 1fr;
-  border-bottom: 1px solid var(--line-strong);
-}
-
-@media (min-width: 960px) {
-  .canvas-split-top {
-    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
-  }
-}
-
-.map-pane {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--line-hairline);
-}
-
-.map-viewport {
-  height: 420px;
+.map-canvas-Interactive {
+  height: 430px;
   width: 100%;
-  background: var(--bg-recessed);
   z-index: 1;
 }
 
-.map-toolbar {
+/* Barra Flutuante Sobre o Mapa */
+.map-floating-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 500;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
-  background: var(--bg-canvas);
-  border-top: 1px solid var(--line-hairline);
+  pointer-events: none;
 }
 
-.specs-pane {
+.map-hud-pill {
+  pointer-events: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 0.85rem;
+  box-shadow: var(--shadow-float);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
 }
 
-.spec-block {
-  padding: 1.15rem 1.35rem;
-  border-bottom: 1px solid var(--line-hairline);
-}
-
-.spec-block:last-child {
-  border-bottom: none;
-}
-
-/* Tabela de Orçamento (Data Table real em vez de cards) */
-.ledger-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.88rem;
-}
-
-.ledger-table tr {
-  border-bottom: 1px solid var(--line-hairline);
-}
-
-.ledger-table tr:last-child {
-  border-bottom: none;
-}
-
-.ledger-table td {
-  padding: 0.5rem 0;
-}
-
-.ledger-table td:last-child {
-  text-align: right;
-  font-family: var(--font-mono);
-  font-weight: 600;
-}
-
-/* Divisão Inferior: Cronograma Editorial (Esquerda) + Checklist de Visitas (Direita) */
-.canvas-split-bottom {
+/* KPI Strip (Métricas Principais da Rota) */
+.kpi-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
 }
 
-@media (min-width: 960px) {
-  .canvas-split-bottom {
-    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+@media (max-width: 820px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.itinerary-pane {
-  padding: 1.35rem 1.5rem;
-  border-right: 1px solid var(--line-hairline);
+.kpi-tile {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
-.timetable {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 0.75rem;
-}
-
-.timetable tr {
-  border-top: 1px solid var(--line-hairline);
-  vertical-align: top;
-}
-
-.timetable td {
-  padding: 0.85rem 0;
-}
-
-.timetable-hour {
-  width: 110px;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--accent-ochre);
+.kpi-label {
+  font-size: 0.75rem;
   font-weight: 600;
-  padding-right: 1rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.timetable-shift {
+.kpi-number {
+  font-size: 1.35rem;
   font-weight: 700;
-  color: var(--text-primary);
-  display: block;
-  margin-bottom: 0.15rem;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
 }
 
-.timetable-desc {
-  font-size: 0.92rem;
-  color: var(--text-secondary);
-  max-width: 62ch;
-}
-
-.checklist-pane {
-  padding: 1.35rem 1.35rem;
-}
-
-.checklist-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.6rem 0;
-  border-bottom: 1px solid var(--line-hairline);
-}
-
-/* Rodapé de Telemetria tipo Barra de Status de IDE */
-.telemetry-statusbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0.5rem 1.5rem;
-  background: var(--bg-recessed);
-  border-top: 1px solid var(--line-strong);
-  font-family: var(--font-mono);
+.kpi-sub {
   font-size: 0.74rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
+}
+
+/* Grade de Painéis Analíticos (Altimetria + Orçamento Lado a Lado) */
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 920px) {
+  .analytics-row {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+/* Timeline de Roteiro (Estilo Wanderlog / Linear) */
+.timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.85rem 1rem;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.timeline-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--brand-primary);
+  background: var(--brand-light);
+  border: 1px solid var(--brand-border);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+/* Check-in Interactive List */
+.place-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.place-item:hover {
+  border-color: var(--border-focus);
+}
+
+.place-item.visited {
+  background: var(--brand-light);
+  border-color: var(--brand-border);
 }
 
 /* Toast Notificações */
@@ -531,21 +516,14 @@ select:focus-visible {
 
 .toast {
   padding: 0.75rem 1rem;
-  border-radius: var(--radius-xs);
-  background: var(--text-primary);
-  color: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
   font-size: 0.85rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  box-shadow: var(--shadow-float);
 }
