@@ -1,0 +1,15 @@
+{
+  "name": "Guia do Turista Inteligente v2",
+  "short_name": "Turista v2",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
