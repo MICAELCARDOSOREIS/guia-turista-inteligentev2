@@ -45,7 +45,7 @@ export default function App() {
   useEffect(() => {
     const handleGoogleMock = (e) => {
       loginGoogleSucesso(e.detail);
-      addToast(`Bem-vindo(a), ${e.detail.nome}!`, 'success');
+      addToast(`Sessão iniciada: ${e.detail.nome}`, 'success');
     };
     window.addEventListener('login_google_mock', handleGoogleMock);
     return () => window.removeEventListener('login_google_mock', handleGoogleMock);
@@ -53,7 +53,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className="app-layout">
+      <div className="workbench-shell">
         <Header
           usuario={usuario}
           googleSalvo={googleSalvo}
@@ -61,11 +61,11 @@ export default function App() {
           onToggleTheme={toggleTheme}
           onMudarVisitante={() => {
             mudarParaModoVisitante();
-            addToast('Sessão alterada para Visitante Temporário (TTL 2h).', 'info');
+            addToast('Modo visitante temporário ativado (2h).', 'info');
           }}
           onRestaurarGoogle={() => {
             restaurarUsuarioGoogle();
-            addToast('Conta Google restaurada com sucesso!', 'success');
+            addToast('Conta Google restaurada.', 'success');
           }}
           onLogout={() => {
             logoutCompleto();
@@ -80,46 +80,40 @@ export default function App() {
               color: '#ffffff',
               textAlign: 'center',
               padding: '0.4rem',
-              fontSize: '0.85rem',
+              fontSize: '0.82rem',
               fontWeight: 600,
             }}
           >
-            ⚠️ Conexão offline detectada. O sistema operará em modo de contingência local.
+            Conexão offline: operando em contingência local.
           </div>
         )}
 
-        <main className="container app-main">
-          {/* Painel Lateral Fixo (Cockpit de Comando) */}
-          <aside className="cockpit-sidebar">
+        <main className="workbench-grid">
+          <aside className="workbench-sidebar">
             <RoteiroForm onSubmit={planejarViagem} carregando={carregando} />
             <HistoricoViagens
               viagens={viagensSalvas}
               roteiroAtual={roteiroAtual}
               onSelecionar={(v) => {
                 setRoteiroAtual(v);
-                addToast(`Roteiro carregado: ${v.destino}`, 'info');
+                addToast(`Rota aberta: ${v.destino}`, 'info');
               }}
               onExcluir={excluirViagem}
             />
           </aside>
 
-          {/* Mosaico Bento Grid (Sem empilhamento vertical em lista) */}
-          <section className="bento-workspace">
-            <MapaRota
-              roteiro={roteiroAtual}
-              userId={usuario?.user_id}
-              telemetria={telemetria}
-            />
+          <section className="workbench-canvas">
+            <MapaRota roteiro={roteiroAtual} userId={usuario?.user_id} />
             <RoteiroResult
               roteiro={roteiroAtual}
               textoGuiaStream={textoGuiaStream}
               streamingGuia={streamingGuia}
               onAlternarVisita={alternarVisitaAtrativo}
             />
-            <TelemetriaCard telemetria={telemetria} />
           </section>
         </main>
 
+        <TelemetriaCard telemetria={telemetria} />
         <Footer />
         <Toast toasts={toasts} onRemove={removeToast} />
       </div>

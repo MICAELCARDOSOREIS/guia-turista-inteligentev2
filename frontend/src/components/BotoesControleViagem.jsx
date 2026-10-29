@@ -12,7 +12,7 @@ export default function BotoesControleViagem({ roteiro }) {
   };
 
   const handleCompartilharWhatsApp = () => {
-    const texto = `🗺️ *Roteiro de Viagem — Guia do Turista Brasil*\n🚗 De: ${roteiro.origem}\n📍 Para: ${roteiro.destino}\n🛣️ Distância: ${roteiro.rota?.distancia_km} km (${roteiro.rota?.duracao_formatada})\n💰 Custo Estimado: R$ ${roteiro.custos?.custo_total?.toFixed(2)}\n☀️ Clima: ${roteiro.clima?.temperatura}°C (${roteiro.clima?.condicao})\n\nGerado via Guia do Turista Inteligente v2!`;
+    const texto = `Roteiro de Viagem — Guia do Turista Brasil\nDe: ${roteiro.origem}\nPara: ${roteiro.destino}\nDistância: ${roteiro.rota?.distancia_km} km (${roteiro.rota?.duracao_formatada})\nCusto Estimado: R$ ${roteiro.custos?.custo_total?.toFixed(2)}\nClima: ${roteiro.clima?.temperatura}°C (${roteiro.clima?.condicao})`;
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -28,37 +28,15 @@ export default function BotoesControleViagem({ roteiro }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.6rem' }}>
-      <button
-        type="button"
-        onClick={handleAbrirGoogleMaps}
-        className="btn-outline"
-      >
-        Abrir no Google Maps
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+      <button type="button" onClick={handleAbrirGoogleMaps} className="btn-utility">
+        Google Maps
       </button>
-
-      <button
-        type="button"
-        onClick={handleCompartilharWhatsApp}
-        className="btn-outline"
-        style={{
-          color: 'var(--accent-secondary)',
-          borderColor: 'var(--accent-secondary)',
-        }}
-      >
-        Compartilhar no WhatsApp
+      <button type="button" onClick={handleCompartilharWhatsApp} className="btn-utility">
+        WhatsApp
       </button>
-
-      <button
-        type="button"
-        onClick={handleDownloadGPX}
-        className="btn-outline"
-        style={{
-          color: 'var(--accent-primary)',
-          borderColor: 'var(--accent-primary)',
-        }}
-      >
-        Exportar Trilha GPX 1.1
+      <button type="button" onClick={handleDownloadGPX} className="btn-utility">
+        Exportar GPX 1.1
       </button>
     </div>
   );

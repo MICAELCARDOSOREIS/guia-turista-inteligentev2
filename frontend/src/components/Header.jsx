@@ -13,38 +13,32 @@ export default function Header({
   const { formatado } = useSessionTimer(usuario);
 
   return (
-    <header className="header-topbar">
-      <div className="header-brand">
-        <div className="brand-highway-shield" aria-hidden="true">
-          <small>BR</small>
-          <strong>343</strong>
-        </div>
-        <div className="header-title-group">
-          <span className="header-title">Guia do Turista Brasil</span>
-          <span className="header-subtitle">Atlas Rodoviário, Altimetria & Telemetria ASGI</span>
-        </div>
+    <header className="topbar">
+      <div className="topbar-brand">
+        <span className="highway-code">BR-343</span>
+        <span className="topbar-title">Guia do Turista Brasil</span>
+        <span className="topbar-meta">Caderno Cartográfico e Planejamento Rodoviário</span>
       </div>
 
-      <div className="header-actions">
+      <div className="topbar-controls">
         <button
           onClick={onToggleTheme}
-          className="btn-outline"
-          title="Alternar modo noturno ou carta solar"
+          className="btn-utility"
+          title="Alternar iluminação da superfície"
           aria-label="Alternar Tema Claro/Escuro"
         >
-          {theme === 'dark' ? '☀️ Carta Solar' : '🌙 Painel Noturno'}
+          {theme === 'dark' ? 'Superfície Clara' : 'Superfície Escura'}
         </button>
 
         {usuario?.is_visitante ? (
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <span className="badge badge-warning" title="Sessão temporária com validade de 2 horas">
+          <>
+            <span className="status-tag" title="Sessão temporária com validade de 2 horas">
               Visitante • {formatado}
             </span>
             {googleSalvo && (
               <button
                 onClick={onRestaurarGoogle}
-                className="btn-outline"
-                style={{ borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }}
+                className="btn-utility"
                 title={`Retomar conta ${googleSalvo.nome}`}
               >
                 Retomar {googleSalvo.nome.split(' ')[0]}
@@ -60,33 +54,27 @@ export default function Header({
                 };
                 window.dispatchEvent(new CustomEvent('login_google_mock', { detail: mockGoogle }));
               }}
-              className="btn-outline"
-              title="Autenticar conta Google"
+              className="btn-utility"
             >
               Entrar com Google
             </button>
-          </div>
+          </>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <span className="badge badge-success">
+          <>
+            <span className="status-tag">
               {usuario?.nome}
             </span>
-            <button
-              onClick={onMudarVisitante}
-              className="btn-outline"
-              title="Alternar para modo visitante preservando a sessão Google em segundo plano"
-            >
+            <button onClick={onMudarVisitante} className="btn-utility">
               Modo Visitante
             </button>
             <button
               onClick={onLogout}
-              className="btn-outline"
+              className="btn-utility"
               style={{ color: 'var(--accent-danger)' }}
-              title="Encerrar sessão"
             >
-              Encerrar sessão
+              Sair
             </button>
-          </div>
+          </>
         )}
       </div>
     </header>

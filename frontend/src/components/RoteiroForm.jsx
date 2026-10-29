@@ -66,57 +66,36 @@ export default function RoteiroForm({ onSubmit, carregando }) {
   const autonomiaSeguraKm = Math.round(autonomiaNominalKm * 0.82);
 
   return (
-    <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
-        <div>
-          <h2 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700 }}>
-            Carta de Navegação
-          </h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-            Defina trecho rodoviário, telemetria veicular e estadia
-          </p>
-        </div>
+    <div className="sidebar-section">
+      <div className="section-heading">
+        <span>Parâmetros do Trecho</span>
         <button
           type="button"
           onClick={handleDetectarGps}
-          className="btn-outline"
+          className="btn-utility"
           disabled={buscandoGps}
-          title="Calcular destinos mais próximos pela distância geodésica de Haversine"
-          style={{ fontSize: '0.75rem', padding: '0.4rem 0.65rem', whiteSpace: 'nowrap' }}
+          style={{ minHeight: 28, padding: '0.2rem 0.55rem', fontSize: '0.74rem' }}
         >
-          {buscandoGps ? 'Localizando...' : 'Raio GPS'}
+          {buscandoGps ? 'Localizando…' : 'Proximidade GPS'}
         </button>
       </div>
 
       {destinosProximos.length > 0 && (
-        <div
-          style={{
-            marginBottom: '1.2rem',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-color)',
-            padding: '0.85rem',
-            borderRadius: 'var(--radius-sm)',
-          }}
-        >
-          <div style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-            Destinos por distância geodésica (Haversine)
+        <div style={{ marginBottom: '0.9rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--line-hairline)' }}>
+          <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
+            Raio geodésico (Haversine):
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
             {destinosProximos.map((d) => (
               <button
                 key={d.cidade}
                 type="button"
-                className="btn-outline font-mono"
-                style={{ fontSize: '0.74rem', padding: '0.3rem 0.6rem' }}
+                className="btn-utility font-mono"
+                style={{ fontSize: '0.72rem', minHeight: 28, padding: '0.2rem 0.5rem' }}
                 onClick={() => handleSelecionarDestinoSugerido(d)}
               >
                 <span>{d.cidade}-{d.uf}</span>
-                <span style={{ color: 'var(--accent-primary)' }}>{d.distancia_km} km</span>
-                {d.requer_paradas && (
-                  <span style={{ color: 'var(--accent-danger)' }} title="Exige parada obrigatória (> 400 km)">
-                    • &gt;400km
-                  </span>
-                )}
+                <span style={{ color: 'var(--accent-ochre)' }}>{d.distancia_km} km</span>
               </button>
             ))}
           </div>
@@ -124,96 +103,89 @@ export default function RoteiroForm({ onSubmit, carregando }) {
       )}
 
       <form onSubmit={handleSubmit}>
-        <div className="route-connector-box">
-          <span className="route-node-dot" style={{ top: '1.9rem' }} aria-hidden="true" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 82px', gap: '0.55rem' }}>
-            <div className="form-group">
-              <label htmlFor="origemCidade" className="form-label">Município de Origem</label>
-              <input
-                id="origemCidade"
-                type="text"
-                className="form-input"
-                value={origemCidade}
-                onChange={(e) => setOrigemCidade(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="origemUf" className="form-label">UF de Origem</label>
-              <input
-                id="origemUf"
-                type="text"
-                maxLength={2}
-                className="form-input font-mono"
-                value={origemUf}
-                onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
-                required
-              />
-            </div>
+        <div className="field-row" style={{ gridTemplateColumns: '1fr 74px' }}>
+          <div>
+            <label htmlFor="origemCidade" className="field-label">Município de Origem</label>
+            <input
+              id="origemCidade"
+              type="text"
+              className="field-input"
+              value={origemCidade}
+              onChange={(e) => setOrigemCidade(e.target.value)}
+              required
+            />
           </div>
-
-          <span className="route-node-dot dest" style={{ bottom: '1.3rem' }} aria-hidden="true" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 82px', gap: '0.55rem' }}>
-            <div className="form-group" style={{ marginBottom: '0.2rem' }}>
-              <label htmlFor="destinoCidade" className="form-label">Município de Destino</label>
-              <input
-                id="destinoCidade"
-                type="text"
-                className="form-input"
-                value={destinoCidade}
-                onChange={(e) => setDestinoCidade(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-group" style={{ marginBottom: '0.2rem' }}>
-              <label htmlFor="destinoUf" className="form-label">UF de Destino</label>
-              <input
-                id="destinoUf"
-                type="text"
-                maxLength={2}
-                className="form-input font-mono"
-                value={destinoUf}
-                onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
-                required
-              />
-            </div>
+          <div>
+            <label htmlFor="origemUf" className="field-label">UF de Origem</label>
+            <input
+              id="origemUf"
+              type="text"
+              maxLength={2}
+              className="field-input font-mono"
+              value={origemUf}
+              onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
+              required
+            />
           </div>
         </div>
 
-        <div className="form-section-divider">Motorização e Autonomia</div>
-
-        <div className="form-group">
-          <div className="propulsion-toggle" role="group" aria-label="Tipo de Propulsão">
-            <button
-              type="button"
-              className={`propulsion-option ${tipoPropulsao === 'combustao' ? 'active-combustao' : ''}`}
-              onClick={() => {
-                setTipoPropulsao('combustao');
-                setConsumoMedio(12.0);
-                setCapacidade(50.0);
-                setPrecoUnidade(5.89);
-              }}
-            >
-              ⛽ Combustão
-            </button>
-            <button
-              type="button"
-              className={`propulsion-option ${tipoPropulsao === 'ev' ? 'active-ev' : ''}`}
-              onClick={() => {
-                setTipoPropulsao('ev');
-                setConsumoMedio(6.5);
-                setCapacidade(60.0);
-                setPrecoUnidade(0.95);
-              }}
-            >
-              ⚡ 100% Elétrico (EV)
-            </button>
+        <div className="field-row" style={{ gridTemplateColumns: '1fr 74px' }}>
+          <div>
+            <label htmlFor="destinoCidade" className="field-label">Município de Destino</label>
+            <input
+              id="destinoCidade"
+              type="text"
+              className="field-input"
+              value={destinoCidade}
+              onChange={(e) => setDestinoCidade(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="destinoUf" className="field-label">UF de Destino</label>
+            <input
+              id="destinoUf"
+              type="text"
+              maxLength={2}
+              className="field-input font-mono"
+              value={destinoUf}
+              onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
+              required
+            />
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-          <div className="form-group">
-            <label htmlFor="consumoMedio" className="form-label">
+        <div className="field-label" style={{ marginTop: '0.85rem' }}>Propulsão</div>
+        <div className="segmented-control" role="group" aria-label="Tipo de Propulsão">
+          <button
+            type="button"
+            className={`segmented-btn ${tipoPropulsao === 'combustao' ? 'is-active' : ''}`}
+            onClick={() => {
+              setTipoPropulsao('combustao');
+              setConsumoMedio(12.0);
+              setCapacidade(50.0);
+              setPrecoUnidade(5.89);
+            }}
+          >
+            Combustão
+          </button>
+          <button
+            type="button"
+            className={`segmented-btn ${tipoPropulsao === 'ev' ? 'is-active' : ''}`}
+            onClick={() => {
+              setTipoPropulsao('ev');
+              setConsumoMedio(6.5);
+              setCapacidade(60.0);
+              setPrecoUnidade(0.95);
+            }}
+          >
+            100% Elétrico (EV)
+          </button>
+        </div>
+
+        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div>
+            <label htmlFor="consumoMedio" className="field-label">
               {tipoPropulsao === 'ev' ? 'Eficiência (km/kWh)' : 'Consumo (km/l)'}
             </label>
             <input
@@ -222,14 +194,14 @@ export default function RoteiroForm({ onSubmit, carregando }) {
               step="0.1"
               min="1"
               max="50"
-              className="form-input font-mono"
+              className="field-input font-mono"
               value={consumoMedio}
               onChange={(e) => setConsumoMedio(e.target.value)}
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="capacidade" className="form-label">
+          <div>
+            <label htmlFor="capacidade" className="field-label">
               {tipoPropulsao === 'ev' ? 'Bateria (kWh)' : 'Tanque (litros)'}
             </label>
             <input
@@ -238,7 +210,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
               step="1"
               min="10"
               max="200"
-              className="form-input font-mono"
+              className="field-input font-mono"
               value={capacidade}
               onChange={(e) => setCapacidade(e.target.value)}
               required
@@ -250,63 +222,59 @@ export default function RoteiroForm({ onSubmit, carregando }) {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0.5rem 0.75rem',
-            marginBottom: '0.85rem',
-            background: 'var(--bg-secondary)',
-            borderRadius: 'var(--radius-xs)',
-            border: '1px solid var(--border-color)',
-            fontSize: '0.76rem',
+            fontSize: '0.78rem',
+            padding: '0.45rem 0',
+            marginBottom: '0.65rem',
+            borderTop: '1px solid var(--line-hairline)',
+            borderBottom: '1px solid var(--line-hairline)',
           }}
         >
-          <span style={{ color: 'var(--text-secondary)' }}>Alcance útil (reserva 18%):</span>
-          <strong className="font-mono" style={{ color: 'var(--accent-secondary)' }}>
-            {autonomiaSeguraKm} km <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {autonomiaNominalKm} km máx</span>
-          </strong>
+          <span style={{ color: 'var(--text-secondary)' }}>Alcance útil (reserva 18%)</span>
+          <span className="font-mono" style={{ fontWeight: 600 }}>
+            {autonomiaSeguraKm} km / {autonomiaNominalKm} km
+          </span>
         </div>
 
-        <div className="form-section-divider">Estadia e Curadoria Cultural</div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
-          <div className="form-group">
-            <label htmlFor="diasEstadia" className="form-label">Duração no Destino</label>
+        <div className="field-row" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div>
+            <label htmlFor="diasEstadia" className="field-label">Estadia</label>
             <select
               id="diasEstadia"
-              className="form-select"
+              className="field-select"
               value={diasEstadia}
               onChange={(e) => setDiasEstadia(e.target.value)}
             >
-              <option value="1">1 dia (bate-volta)</option>
-              <option value="2">2 dias (fim de semana)</option>
-              <option value="3">3 dias (feriado)</option>
-              <option value="4">4 dias (imersão)</option>
-              <option value="5">5 dias (expedição)</option>
+              <option value="1">1 dia</option>
+              <option value="2">2 dias</option>
+              <option value="3">3 dias</option>
+              <option value="4">4 dias</option>
+              <option value="5">5 dias</option>
             </select>
           </div>
-          <div className="form-group">
-            <label htmlFor="estiloViagem" className="form-label">Foco do Roteiro</label>
+          <div>
+            <label htmlFor="estiloViagem" className="field-label">Foco</label>
             <select
               id="estiloViagem"
-              className="form-select"
+              className="field-select"
               value={estiloViagem}
               onChange={(e) => setEstiloViagem(e.target.value)}
             >
-              <option value="Cultural">Histórico & Cultural</option>
-              <option value="Gastronômico">Rota Gastronômica</option>
-              <option value="Ecoturismo">Natureza & Ecoturismo</option>
-              <option value="Família">Lazer em Família</option>
-              <option value="Romântico">Refúgio & Charme</option>
+              <option value="Cultural">Cultural</option>
+              <option value="Gastronômico">Gastronômico</option>
+              <option value="Ecoturismo">Ecoturismo</option>
+              <option value="Família">Família</option>
+              <option value="Romântico">Romântico</option>
             </select>
           </div>
         </div>
 
         <button
           type="submit"
-          className="btn-primary"
+          className="btn-action"
           disabled={carregando}
-          style={{ marginTop: '0.5rem' }}
+          style={{ marginTop: '0.35rem' }}
         >
-          {carregando ? 'Processando Rota, Relevo & IA...' : 'Traçar Rota e Gerar Guia'}
+          {carregando ? 'Processando rota e relevo…' : 'Calcular Rota e Roteiro'}
         </button>
       </form>
     </div>

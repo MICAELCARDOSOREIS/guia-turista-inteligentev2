@@ -61,12 +61,12 @@ export default function MapaRota({ roteiro, userId }) {
     const coords = roteiro.rota.coordinates.map((c) => [c[1], c[0]]);
 
     const polyline = L.polyline(coords, {
-      color: '#E09F3E',
-      weight: 5,
-      opacity: 0.92,
+      color: '#1B5E4A',
+      weight: 4,
+      opacity: 0.9,
     }).addTo(polylineLayer.current);
 
-    map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+    map.fitBounds(polyline.getBounds(), { padding: [28, 28] });
 
     if (coords.length > 0) {
       L.marker(coords[0])
@@ -80,16 +80,16 @@ export default function MapaRota({ roteiro, userId }) {
 
     if (roteiro.paradas_recarga) {
       roteiro.paradas_recarga.forEach((p) => {
-        const iconeHtml = p.tipo.includes('Eletroposto') ? '⚡' : '⛽';
+        const rotulo = p.tipo.includes('Eletroposto') ? 'EV' : 'KM';
         const customIcon = L.divIcon({
           className: 'custom-map-icon',
-          html: `<div style="background:var(--bg-secondary); border:2px solid var(--accent-primary); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:var(--shadow-md);">${iconeHtml}</div>`,
-          iconSize: [30, 30],
+          html: `<div style="background:var(--bg-surface); border:1.5px solid var(--text-primary); color:var(--text-primary); border-radius:3px; width:26px; height:20px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-weight:700; font-size:10px;">${rotulo}</div>`,
+          iconSize: [26, 20],
         });
 
         L.marker([p.lat, p.lon], { icon: customIcon })
           .bindPopup(
-            `<b>${p.nome}</b><br/>${p.tipo}<br/>Parada estimada: ${p.tempo_estimado_min} min<br/>Reserva no ponto: ${p.reserva_restante_pct}%`
+            `<b>${p.nome}</b><br/>${p.tipo}<br/>Parada estimada: ${p.tempo_estimado_min} min<br/>Reserva: ${p.reserva_restante_pct}%`
           )
           .addTo(markersLayer.current);
       });
@@ -98,91 +98,17 @@ export default function MapaRota({ roteiro, userId }) {
 
   if (!roteiro) {
     return (
-      <>
-        {/* Bloco 8 colunas: Apresentação do Atlas */}
-        <div
-          className="card bento-span-8"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            minHeight: 340,
-            background:
-              'radial-gradient(circle at 80% 20%, rgba(46, 196, 182, 0.12), transparent 55%), var(--bg-card)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <span className="badge badge-info">Carta Cartográfica OSRM + Open-Elevation</span>
-            <span className="font-mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-              SIRGAS 2000 • ESCALA DINÂMICA
-            </span>
-          </div>
-
-          <div style={{ margin: '1.5rem 0' }}>
-            <h2 className="font-display" style={{ fontSize: '1.75rem', fontWeight: 700, lineHeight: 1.2, marginBottom: '0.65rem' }}>
-              Planejamento rodoviário com altimetria real, reserva de autonomia e guia em tempo real.
-            </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', maxWidth: '56ch' }}>
-              Configure a rota no painel à esquerda para renderizar o mapa interativo, o corte topográfico da serra,
-              o orçamento dividido por ocupante e a curadoria cultural via Server-Sent Events (SSE).
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.65rem' }}>
-            <div className="odometer-cell">
-              <span className="odometer-label">Corredor Litorâneo</span>
-              <span className="odometer-value" style={{ fontSize: '0.95rem' }}>Teresina → Parnaíba</span>
-            </div>
-            <div className="odometer-cell">
-              <span className="odometer-label">Serra da Ibiapaba</span>
-              <span className="odometer-value" style={{ fontSize: '0.95rem' }}>Teresina → Pedro II</span>
-            </div>
-            <div className="odometer-cell">
-              <span className="odometer-label">Rota das Emoções</span>
-              <span className="odometer-value" style={{ fontSize: '0.95rem' }}>Parnaíba → Jeri</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Bloco 4 colunas: Especificações de Engenharia */}
-        <div
-          className="card bento-span-4"
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            gap: '0.85rem',
-          }}
-        >
-          <div>
-            <span className="badge badge-warning">Arquitetura ASGI</span>
-            <h3 className="font-display" style={{ fontSize: '1.15rem', marginTop: '0.5rem' }}>
-              Módulos Ativos no Painel
-            </h3>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.55rem' }}>
-            <div className="odometer-cell">
-              <span className="odometer-label">Orquestração Paralela</span>
-              <span className="font-mono" style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--accent-secondary)' }}>
-                Duplo asyncio.gather()
-              </span>
-            </div>
-            <div className="odometer-cell">
-              <span className="odometer-label">Reserva de Segurança</span>
-              <span className="font-mono" style={{ fontSize: '0.84rem', fontWeight: 600, color: 'var(--accent-primary)' }}>
-                Margem energética de 18%
-              </span>
-            </div>
-            <div className="odometer-cell">
-              <span className="odometer-label">Exportação GPS</span>
-              <span className="font-mono" style={{ fontSize: '0.84rem', fontWeight: 600 }}>
-                Padrão XML GPX 1.1
-              </span>
-            </div>
-          </div>
-        </div>
-      </>
+      <div style={{ padding: '2.5rem 2rem', borderBottom: '1px solid var(--line-strong)' }}>
+        <span className="font-mono" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          SIRGAS 2000 • OSRM ROUTING • OPEN-ELEVATION
+        </span>
+        <h2 className="font-display" style={{ fontSize: '1.7rem', fontWeight: 700, marginTop: '0.5rem', marginBottom: '0.5rem', maxWidth: '52ch' }}>
+          Selecione o município de partida e destino na coluna à esquerda para traçar a folha de rota.
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '60ch' }}>
+          O sistema consulta simultaneamente a geometria viária OSRM, a altimetria da rodovia e as condições meteorológicas para dimensionar paradas e custos por ocupante.
+        </p>
+      </div>
     );
   }
 
@@ -193,126 +119,115 @@ export default function MapaRota({ roteiro, userId }) {
 
   return (
     <>
-      {/* 1. FAIXA SUPERIOR (12 colunas): Cabeçalho da Rota + 4 Células de Hodômetro */}
-      <div className="card bento-span-12" style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <h2 className="font-display" style={{ fontSize: '1.45rem', fontWeight: 700 }}>
-                {roteiro.origem} → {roteiro.destino}
-              </h2>
-              <span className="badge badge-success">
-                {roteiro.paradas_recarga?.length || 0} {roteiro.paradas_recarga?.length === 1 ? 'parada' : 'paradas'}
-              </span>
-            </div>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              Cálculo rodoviário OSRM com margem energética de 18% e compensação de relevo Open-Elevation
-            </span>
-          </div>
-
-          {rota.rotas_alternativas && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-              {rota.rotas_alternativas.map((alt) => {
-                const ativa = sugestaoSelecionada === alt.id;
-                return (
-                  <button
-                    key={alt.id}
-                    type="button"
-                    className="btn-outline"
-                    style={{
-                      borderColor: ativa ? 'var(--accent-primary)' : 'var(--border-color)',
-                      background: ativa ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
-                      color: ativa ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                    }}
-                    onClick={() => setSugestaoSelecionada(alt.id)}
-                  >
-                    <span>{alt.nome}</span>
-                    <span className="font-mono" style={{ fontSize: '0.72rem' }}>
-                      {alt.distancia_km} km
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+      {/* 1. Cabeçalho da Folha de Rota */}
+      <div className="route-header-bar">
+        <div>
+          <h2 className="font-display" style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+            {roteiro.origem} → {roteiro.destino}
+          </h2>
+          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+            {roteiro.paradas_recarga?.length || 0} {roteiro.paradas_recarga?.length === 1 ? 'parada programada' : 'paradas programadas'} (margem de segurança energética de 18%)
+          </span>
         </div>
 
-        <div className="odometer-strip">
-          <div className="odometer-cell">
-            <span className="odometer-label">Extensão do Trecho</span>
-            <span className="odometer-value">{rota.distancia_km} km</span>
+        {rota.rotas_alternativas && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+            {rota.rotas_alternativas.map((alt) => {
+              const ativa = sugestaoSelecionada === alt.id;
+              return (
+                <button
+                  key={alt.id}
+                  type="button"
+                  className="btn-utility"
+                  style={{
+                    borderColor: ativa ? 'var(--text-primary)' : 'var(--line-strong)',
+                    background: ativa ? 'var(--bg-active)' : 'var(--bg-canvas)',
+                  }}
+                  onClick={() => setSugestaoSelecionada(alt.id)}
+                >
+                  <span>{alt.nome}</span>
+                  <span className="font-mono" style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                    {alt.distancia_km} km
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          <div className="odometer-cell">
-            <span className="odometer-label">Tempo de Condução</span>
-            <span className="odometer-value">{rota.duracao_formatada}</span>
-          </div>
-          <div className="odometer-cell">
-            <span className="odometer-label">Desnível Líquido</span>
-            <span className="odometer-value">
-              {altimetria?.desnivel_liquido_m > 0 ? `+${altimetria.desnivel_liquido_m} m` : `${altimetria?.desnivel_liquido_m} m`}
-            </span>
-          </div>
-          <div className="odometer-cell">
-            <span className="odometer-label">Clima no Destino</span>
-            <span className="odometer-value" style={{ color: 'var(--accent-secondary)' }}>
-              {clima ? `${clima.temperatura}°C` : '--'} <small style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{clima?.condicao}</small>
-            </span>
-          </div>
+        )}
+      </div>
+
+      {/* 2. Faixa de Medidores Separados por Fios (Hairline Ledger) */}
+      <div className="metrics-ledger">
+        <div className="ledger-cell">
+          <span className="ledger-label">Distância Rodoviária</span>
+          <span className="ledger-value">{rota.distancia_km} km</span>
+        </div>
+        <div className="ledger-cell">
+          <span className="ledger-label">Tempo Estimado</span>
+          <span className="ledger-value">{rota.duracao_formatada}</span>
+        </div>
+        <div className="ledger-cell">
+          <span className="ledger-label">Desnível Líquido</span>
+          <span className="ledger-value">
+            {altimetria?.desnivel_liquido_m > 0 ? `+${altimetria.desnivel_liquido_m} m` : `${altimetria?.desnivel_liquido_m} m`}
+          </span>
+        </div>
+        <div className="ledger-cell">
+          <span className="ledger-label">Clima no Destino</span>
+          <span className="ledger-value">
+            {clima ? `${clima.temperatura}°C` : '--'}{' '}
+            <small style={{ fontFamily: 'var(--font-sans)', fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-secondary)' }}>
+              {clima?.condicao}
+            </small>
+          </span>
         </div>
       </div>
 
-      {/* 2. BLOCO ESQUERDO (7 colunas): Mapa Interativo + Botões de Exportação */}
-      <div className="card bento-span-7" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.85rem' }}>
-        <div className="map-frame">
-          <div ref={mapRef} className="map-container" />
-          {coordPartida && coordChegada && (
-            <div className="map-coordinates-overlay">
-              ORIG {coordPartida[1].toFixed(3)}°, {coordPartida[0].toFixed(3)}° • DEST {coordChegada[1].toFixed(3)}°, {coordChegada[0].toFixed(3)}°
-            </div>
-          )}
-        </div>
-        <BotoesControleViagem roteiro={roteiro} />
-      </div>
-
-      {/* 3. BLOCO DIREITO (5 colunas): Altimetria + Orçamento & Rateio Lado a Lado com o Mapa */}
-      <div className="bento-span-5" style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
-        {/* Card de Corte Topográfico */}
-        <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700 }}>
-              Corte Topográfico & Relevo
-            </h3>
-            <span className="badge badge-warning">
-              +{altimetria?.penalizacao_consumo_pct}% consumo
+      {/* 3. Divisão Superior: Mapa à Esquerda | Altimetria e Tabela Contábil à Direita */}
+      <div className="canvas-split-top">
+        <div className="map-pane">
+          <div ref={mapRef} className="map-viewport" />
+          <div className="map-toolbar">
+            <span className="font-mono" style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              {coordPartida && coordChegada
+                ? `${coordPartida[1].toFixed(3)}°, ${coordPartida[0].toFixed(3)}° → ${coordChegada[1].toFixed(3)}°, ${coordChegada[0].toFixed(3)}°`
+                : 'Geometria OSRM'}
             </span>
+            <BotoesControleViagem roteiro={roteiro} />
           </div>
+        </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
-            <div className="odometer-cell" style={{ padding: '0.5rem 0.65rem' }}>
-              <span className="odometer-label">Subida</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--accent-danger)' }}>
-                +{altimetria?.ganho_elevacao_m} m
+        <div className="specs-pane">
+          {/* Bloco de Altimetria */}
+          <div className="spec-block">
+            <div className="section-heading">
+              <span>Altimetria da Rodovia</span>
+              <span className="font-mono" style={{ color: 'var(--accent-ochre)' }}>
+                +{altimetria?.penalizacao_consumo_pct}% consumo
               </span>
             </div>
-            <div className="odometer-cell" style={{ padding: '0.5rem 0.65rem' }}>
-              <span className="odometer-label">Descida</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--accent-secondary)' }}>
-                -{altimetria?.perda_elevacao_m} m
-              </span>
-            </div>
-            <div className="odometer-cell" style={{ padding: '0.5rem 0.65rem' }}>
-              <span className="odometer-label">Altitude Máx</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '0.9rem' }}>
-                {altimetria?.altitude_maxima_m} m
-              </span>
-            </div>
-          </div>
 
-          <div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', height: 68, gap: 4, background: 'var(--bg-secondary)', padding: '8px 6px 4px', borderRadius: 8 }}>
+            <table className="ledger-table" style={{ marginBottom: '0.85rem' }}>
+              <tbody>
+                <tr>
+                  <td style={{ color: 'var(--text-secondary)' }}>Ganho de subida acumulado</td>
+                  <td>+{altimetria?.ganho_elevacao_m} m</td>
+                </tr>
+                <tr>
+                  <td style={{ color: 'var(--text-secondary)' }}>Descida acumulada</td>
+                  <td>-{altimetria?.perda_elevacao_m} m</td>
+                </tr>
+                <tr>
+                  <td style={{ color: 'var(--text-secondary)' }}>Cota máxima do trecho</td>
+                  <td>{altimetria?.altitude_maxima_m} m</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div style={{ display: 'flex', alignItems: 'flex-end', height: 56, gap: 3, padding: '6px 0', borderBottom: '1px solid var(--line-strong)' }}>
               {altimetria?.perfil?.map((p, idx) => {
                 const max = altimetria.altitude_maxima_m || 300;
-                const alturaBarra = Math.max((p.elevacao / max) * 100, 14);
+                const alturaBarra = Math.max((p.elevacao / max) * 100, 12);
                 return (
                   <div
                     key={idx}
@@ -320,8 +235,8 @@ export default function MapaRota({ roteiro, userId }) {
                     style={{
                       flex: 1,
                       height: `${alturaBarra}%`,
-                      background: 'linear-gradient(180deg, var(--accent-primary) 0%, rgba(224, 159, 62, 0.25) 100%)',
-                      borderRadius: '3px 3px 0 0',
+                      background: 'var(--text-primary)',
+                      opacity: 0.72,
                     }}
                   />
                 );
@@ -329,63 +244,55 @@ export default function MapaRota({ roteiro, userId }) {
             </div>
             <div className="font-mono" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 4 }}>
               <span>0 km</span>
-              <span>Perfil Open-Elevation</span>
+              <span>Open-Elevation</span>
               <span>{rota.distancia_km} km</span>
             </div>
           </div>
-        </div>
 
-        {/* Card de Orçamento Rodoviário & Rateio */}
-        <div className="card" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-            <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700 }}>
-              Orçamento & Rateio
-            </h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <label htmlFor="passageirosInput" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                Ocupantes:
-              </label>
-              <select
-                id="passageirosInput"
-                className="form-select font-mono"
-                style={{ width: 'auto', padding: '0.22rem 0.5rem', fontSize: '0.78rem' }}
-                value={passageiros}
-                onChange={(e) => setPassageiros(parseInt(e.target.value, 10))}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <option key={n} value={n}>
-                    {n}x
-                  </option>
-                ))}
-              </select>
+          {/* Bloco Contábil de Custos e Rateio */}
+          <div className="spec-block">
+            <div className="section-heading">
+              <span>Demonstrativo de Custos</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <label htmlFor="passageirosInput" style={{ fontSize: '0.74rem' }}>Ocupantes:</label>
+                <select
+                  id="passageirosInput"
+                  className="field-select font-mono"
+                  style={{ width: 'auto', minHeight: 26, padding: '0.1rem 0.4rem', fontSize: '0.76rem' }}
+                  value={passageiros}
+                  onChange={(e) => setPassageiros(parseInt(e.target.value, 10))}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.55rem' }}>
-            <div className="odometer-cell" style={{ padding: '0.55rem 0.7rem' }}>
-              <span className="odometer-label">Combustível / Energia</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                R$ {custosExibicao?.custo_combustivel_ou_energia?.toFixed(2)}
-              </span>
-            </div>
-            <div className="odometer-cell" style={{ padding: '0.55rem 0.7rem' }}>
-              <span className="odometer-label">Pedágios Estimados</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                R$ {custosExibicao?.custo_pedagios?.toFixed(2)}
-              </span>
-            </div>
-            <div className="odometer-cell" style={{ padding: '0.55rem 0.7rem' }}>
-              <span className="odometer-label">Total da Viagem</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent-primary)' }}>
-                R$ {custosExibicao?.custo_total?.toFixed(2)}
-              </span>
-            </div>
-            <div className="odometer-cell" style={{ padding: '0.55rem 0.7rem', background: 'var(--bg-elevated)', borderColor: 'var(--accent-secondary)' }}>
-              <span className="odometer-label">Por Pessoa ({passageiros}x)</span>
-              <span className="font-mono" style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--accent-secondary)' }}>
-                R$ {custosExibicao?.custo_por_passageiro?.toFixed(2)}
-              </span>
-            </div>
+            <table className="ledger-table">
+              <tbody>
+                <tr>
+                  <td style={{ color: 'var(--text-secondary)' }}>Combustível / Energia</td>
+                  <td>R$ {custosExibicao?.custo_combustivel_ou_energia?.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td style={{ color: 'var(--text-secondary)' }}>Pedágios estimados</td>
+                  <td>R$ {custosExibicao?.custo_pedagios?.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td style={{ fontWeight: 600 }}>Custo total da viagem</td>
+                  <td>R$ {custosExibicao?.custo_total?.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>
+                    Rateio individual ({passageiros} {passageiros === 1 ? 'pessoa' : 'pessoas'})
+                  </td>
+                  <td style={{ color: 'var(--accent-primary)', fontSize: '1rem' }}>
+                    R$ {custosExibicao?.custo_por_passageiro?.toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
