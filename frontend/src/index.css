@@ -537,18 +537,84 @@ select:focus-visible {
   gap: 0.5rem;
 }
 
-/* Guia Editorial em Streaming */
-.editorial-guide-body {
-  line-height: 1.72;
-  font-size: 0.92rem;
-  white-space: pre-wrap;
-  color: var(--text-primary);
+/* Grade de 3 Colunas para Turnos do Roteiro (Manhã / Tarde / Noite) */
+.shift-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .shift-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shift-card {
   background: var(--bg-secondary);
-  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-top: 2px solid var(--accent-primary);
   border-radius: var(--radius-sm);
-  border-left: 3px solid var(--accent-primary);
-  max-height: 410px;
-  overflow-y: auto;
+  padding: 0.85rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.shift-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shift-time {
+  font-size: 0.68rem;
+  color: var(--accent-primary);
+}
+
+.shift-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.shift-body {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.guide-footer-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .guide-footer-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.guide-note-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+}
+
+.guide-note-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.guide-note-text {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-primary);
 }
 
 /* Toast Notificações */

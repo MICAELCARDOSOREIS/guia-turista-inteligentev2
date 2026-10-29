@@ -1,5 +1,67 @@
 import React from 'react';
 
+function limparTextoRaw(str) {
+  if (!str) return '';
+  return str
+    .replace(/\*\*/g, '')
+    .replace(/^[🏛️🗓️🍲☀️🧭📍•\-\s]+/u, '')
+    .trim();
+}
+
+function extrairSecoesGuia(textoBruto, roteiro) {
+  const texto = (textoBruto || '').trim();
+  const resultado = {
+    essencia: '',
+    turnos: {
+      manha: '',
+      tarde: '',
+      noite: '',
+    },
+    gastronomia: '',
+    climaDica: '',
+    outrosParagrafos: [],
+  };
+
+  if (!texto) return resultado;
+
+  const linhas = texto
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+  for (const linha of linhas) {
+    const limpa = linha.replace(/\*\*/g, '');
+
+    if (/identidade|atmosfera|ess[êe]ncia/i.test(limpa)) {
+      const partes = limpa.split(':');
+      resultado.essencia = limparTextoRaw(partes.slice(1).join(':') || limpa);
+    } else if (/manh[ãa]\s*:/i.test(limpa)) {
+      const partes = limpa.split(/manh[ãa]\s*:/i);
+      resultado.turnos.manha = limparTextoRaw(partes[1] || limpa);
+    } else if (/tarde\s*:/i.test(limpa)) {
+      const partes = limpa.split(/tarde\s*:/i);
+      resultado.turnos.tarde = limparTextoRaw(partes[1] || limpa);
+    } else if (/noite\s*:/i.test(limpa)) {
+      const partes = limpa.split(/noite\s*:/i);
+      resultado.turnos.noite = limparTextoRaw(partes[1] || limpa);
+    } else if (/gastron[ôo]mic|gastronomia|sabores|culin[áa]ria/i.test(limpa)) {
+      const partes = limpa.split(':');
+      resultado.gastronomia = limparTextoRaw(partes.slice(1).join(':') || limpa);
+    } else if (/orienta[çc][õo]es|clima|vestu[áa]rio/i.test(limpa)) {
+      const partes = limpa.split(':');
+      resultado.climaDica = limparTextoRaw(partes.slice(1).join(':') || limpa);
+    } else if (!/roteiro sugerido/i.test(limpa)) {
+      resultado.outrosParagrafos.push(limparTextoRaw(limpa));
+    }
+  }
+
+  if (!resultado.essencia && roteiro?.destino) {
+    resultado.essencia = resultado.outrosParagrafos.shift() || `${roteiro.destino} reúne patrimônio histórico, paisagens naturais e hospitalidade regional.`;
+  }
+
+  return resultado;
+}
+
 export default function RoteiroResult({
   roteiro,
   textoGuiaStream,
@@ -8,48 +70,81 @@ export default function RoteiroResult({
 }) {
   if (!roteiro) return null;
 
-  const { atrativos_sugeridos, gastronomia_sugerida, atrativos_visitados, guia } = roteiro;
+  const { atrativos_sugeridos, gastronomia_sugerida, atrativos_visitados, guia, clima } = roteiro;
   const visitadosSet = new Set(atrativos_visitados || []);
   const textoExibicao = textoGuiaStream || guia;
+  const secoes = extrairSecoesGuia(textoExibicao, roteiro);
 
   return (
     <>
-      {/* 4. BLOCO ESQUERDO INFERIOR (7 colunas): Caderno de Campo em Streaming SSE */}
-      <div className="card bento-span-7" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+      {/* 4. BLOCO ESQUERDO INFERIOR (7 colunas): Roteiro Estruturado por Turnos (Sem cara de texto cru de IA) */}
+      <div className="card bento-span-7" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
           <div>
-            <h3 className="font-display" style={{ fontSize: '1.2rem', fontWeight: 700 }}>
-              Caderno de Campo & Roteiro Cultural
+            <h3 className="font-display" style={{ fontSize: '1.22rem', fontWeight: 700 }}>
+              Roteiro de Campo — {roteiro.destino}
             </h3>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-              Itinerário narrativo transmitido em tempo real para {roteiro.destino}
-            </span>
+            <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+              {secoes.essencia}
+            </p>
           </div>
-          {streamingGuia ? (
+          {streamingGuia && (
             <span className="badge badge-warning">
-              Transmitindo via SSE...
-            </span>
-          ) : (
-            <span className="badge badge-success">
-              Roteiro Completo
+              Atualizando roteiro...
             </span>
           )}
         </div>
 
-        <div className="editorial-guide-body">
-          {textoExibicao}
-          {streamingGuia && (
-            <span
-              style={{
-                display: 'inline-block',
-                width: 8,
-                height: 16,
-                background: 'var(--accent-primary)',
-                marginLeft: 5,
-                verticalAlign: 'middle',
-              }}
-            />
-          )}
+        {/* Grade de 3 Colunas: Manhã / Tarde / Noite */}
+        <div className="shift-cards-grid">
+          <div className="shift-card">
+            <div className="shift-card-header">
+              <span className="font-mono shift-time">07h — 12h</span>
+              <strong className="shift-title">Manhã</strong>
+            </div>
+            <p className="shift-body">
+              {secoes.turnos.manha || 'Saída nas primeiras horas para aproveitar a luz matinal e temperaturas amenas nos pontos principais.'}
+            </p>
+          </div>
+
+          <div className="shift-card">
+            <div className="shift-card-header">
+              <span className="font-mono shift-time">13h — 18h</span>
+              <strong className="shift-title">Tarde</strong>
+            </div>
+            <p className="shift-body">
+              {secoes.turnos.tarde || 'Percurso pelos mirantes e centros históricos com parada estratégica no pôr do sol.'}
+            </p>
+          </div>
+
+          <div className="shift-card">
+            <div className="shift-card-header">
+              <span className="font-mono shift-time">19h — 23h</span>
+              <strong className="shift-title">Noite</strong>
+            </div>
+            <p className="shift-body">
+              {secoes.turnos.noite || 'Jantar regional e caminhada tranquila pelo polo gastronômico e calçadão.'}
+            </p>
+          </div>
+        </div>
+
+        {/* Rodapé Duplo do Roteiro: Mesa Regional & Recomendação Climática */}
+        <div className="guide-footer-split">
+          <div className="guide-note-box">
+            <span className="guide-note-label">Mesa & Culinária Local</span>
+            <p className="guide-note-text">
+              {secoes.gastronomia || `Experimente ${gastronomia_sugerida?.join(', ') || 'os pratos típicos da região'}.`}
+            </p>
+          </div>
+
+          <div className="guide-note-box">
+            <span className="guide-note-label">
+              Preparo para o Clima ({clima?.temperatura || 28}°C • {clima?.condicao || 'Estável'})
+            </span>
+            <p className="guide-note-text">
+              {secoes.climaDica || 'Use roupas leves com proteção solar e mantenha hidratação constante ao longo da viagem.'}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -104,7 +199,7 @@ export default function RoteiroResult({
                       color: visitado ? 'var(--accent-secondary)' : 'var(--text-muted)',
                     }}
                   >
-                    {visitado ? '✓ CARIMBADO' : '+ CARIMBAR VISITA'}
+                    {visitado ? '✓ VISITADO' : 'MARCAR VISITA'}
                   </span>
                 </button>
               );
@@ -115,7 +210,7 @@ export default function RoteiroResult({
         {gastronomia_sugerida && gastronomia_sugerida.length > 0 && (
           <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem' }}>
             <span style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.45rem' }}>
-              Sabores Regionais Indispensáveis
+              Pratos Típicos do Destino
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.45rem' }}>
               {gastronomia_sugerida.map((prato) => (

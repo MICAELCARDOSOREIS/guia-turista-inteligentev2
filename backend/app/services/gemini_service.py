@@ -32,13 +32,13 @@ def _montar_guia_deterministico(
     pratos = ", ".join(gastronomia[:3]) if gastronomia else "pratos regionais e doces típicos"
 
     paragrafos = [
-        f"🏛️ **Identidade & Atmosfera:** {destino} combina tradição cultural marcante, natureza exuberante e acolhimento singular para o viajante {estilo_viagem.lower()}.\n\n",
-        f"🗓️ **Roteiro Sugerido ({dias_estadia} dia{'s' if dias_estadia > 1 else ''}):**\n",
-        f"• **Manhã:** Inicie explorando com calma {atr1} aproveitando a temperatura mais fresca da alvorada.\n",
-        f"• **Tarde:** Visite {atr2} com parada estratégica para sombra e fotos panorâmicas do percurso.\n",
-        f"• **Noite:** Desfrute da culinária boêmia e passeios iluminados nos pólos culturais da cidade.\n\n",
-        f"🍲 **Tradições Gastronômicas:** Saboreie {pratos} nos restaurantes tradicionais da região.\n\n",
-        f"☀️ **Orientações & Clima ({temp}°C, {cond}):** Vista roupas leves com proteção solar e hidrate-se com frequência durante os deslocamentos rodoviários.\n"
+        f"Identidade & Atmosfera: {destino} combina tradição cultural marcante, natureza exuberante e acolhimento singular para o viajante {estilo_viagem.lower()}.\n\n",
+        f"Roteiro Sugerido ({dias_estadia} dia{'s' if dias_estadia > 1 else ''}):\n",
+        f"Manhã: Inicie explorando com calma {atr1} aproveitando a temperatura mais fresca da alvorada.\n",
+        f"Tarde: Visite {atr2} com parada estratégica para sombra e fotos panorâmicas do percurso.\n",
+        f"Noite: Desfrute da culinária boêmia e passeios iluminados nos polos culturais da cidade.\n\n",
+        f"Tradições Gastronômicas: Saboreie {pratos} nos restaurantes tradicionais da região.\n\n",
+        f"Orientações & Clima ({temp}°C, {cond}): Vista roupas leves com proteção solar e hidrate-se com frequência durante os deslocamentos rodoviários.\n"
     ]
     return paragrafos
 
