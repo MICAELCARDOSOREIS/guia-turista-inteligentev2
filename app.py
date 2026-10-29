@@ -1,4 +1,4 @@
-﻿"""Aplicação Flask Principal - Guia do Turista Inteligente (API Gateway em Python)."""
+"""Aplicação Flask Principal - Guia do Turista Inteligente (API Gateway em Python)."""
 
 import json
 import os
@@ -217,7 +217,7 @@ def index():
     )
 
 
-@app.route("/auth/google/callback", methods=["GET", "POST"])
+@app.route("/auth/google/callback", methods=["POST"])
 def google_callback():
     """Recebe a credencial JWT do Google e valida 100% no Python."""
     token = request.form.get("credential", "").strip()
