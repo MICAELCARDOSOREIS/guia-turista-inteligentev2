@@ -15,30 +15,30 @@ export default function Header({
   return (
     <header className="header-topbar">
       <div className="header-brand">
-        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="45" fill="var(--accent-primary)" />
-          <path d="M50 20 L60 45 L85 45 L65 60 L72 85 L50 70 L28 85 L35 60 L15 45 L40 45 Z" fill="#ffffff" />
-        </svg>
-        <span>Guia do Turista Brasil</span>
-        <span className="badge badge-info" style={{ fontSize: '0.65rem' }}>v2.0 ASGI</span>
+        <div className="brand-highway-shield" aria-hidden="true">
+          <small>BR</small>
+          <strong>343</strong>
+        </div>
+        <div className="header-title-group">
+          <span className="header-title">Guia do Turista Brasil</span>
+          <span className="header-subtitle">Atlas Rodoviário, Altimetria & Telemetria ASGI</span>
+        </div>
       </div>
 
       <div className="header-actions">
-        {/* Alternador de Tema */}
         <button
           onClick={onToggleTheme}
           className="btn-outline"
-          title="Alternar Tema Claro/Escuro"
+          title="Alternar modo noturno ou carta solar"
           aria-label="Alternar Tema Claro/Escuro"
         >
-          {theme === 'dark' ? '☀️ Claro' : '🌙 Escuro'}
+          {theme === 'dark' ? '☀️ Carta Solar' : '🌙 Painel Noturno'}
         </button>
 
-        {/* Sessão do Usuário */}
         {usuario?.is_visitante ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span className="badge badge-warning" title="Sessão Temporária de Visitante">
-              Visitante ({formatado})
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span className="badge badge-warning" title="Sessão temporária com validade de 2 horas">
+              Visitante • {formatado}
             </span>
             {googleSalvo && (
               <button
@@ -47,37 +47,36 @@ export default function Header({
                 style={{ borderColor: 'var(--accent-primary)', color: 'var(--accent-primary)' }}
                 title={`Retomar conta ${googleSalvo.nome}`}
               >
-                Voltar para {googleSalvo.nome.split(' ')[0]}
+                Retomar {googleSalvo.nome.split(' ')[0]}
               </button>
             )}
             <button
               onClick={() => {
-                // Simulação de login Google para apresentação
                 const mockGoogle = {
                   user_id: 'google_1029384756',
-                  nome: 'Micael Aluno',
-                  email: 'micael@ufpi.edu.br',
+                  nome: 'Maria Clara Martins',
+                  email: 'mariaclara@ufpi.edu.br',
                   is_visitante: false,
                 };
                 window.dispatchEvent(new CustomEvent('login_google_mock', { detail: mockGoogle }));
               }}
               className="btn-outline"
-              title="Conectar com Google"
+              title="Autenticar conta Google"
             >
-              🔑 Google Sign-In
+              Entrar com Google
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-              👤 {usuario?.nome}
+          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <span className="badge badge-success">
+              {usuario?.nome}
             </span>
             <button
               onClick={onMudarVisitante}
               className="btn-outline"
-              title="Trocar para modo visitante sem desconectar"
+              title="Alternar para modo visitante preservando a sessão Google em segundo plano"
             >
-              Usar como Visitante
+              Modo Visitante
             </button>
             <button
               onClick={onLogout}
@@ -85,7 +84,7 @@ export default function Header({
               style={{ color: 'var(--accent-danger)' }}
               title="Encerrar sessão"
             >
-              Sair
+              Encerrar sessão
             </button>
           </div>
         )}

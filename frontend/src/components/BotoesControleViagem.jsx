@@ -28,14 +28,13 @@ export default function BotoesControleViagem({ roteiro }) {
   };
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.6rem' }}>
       <button
         type="button"
         onClick={handleAbrirGoogleMaps}
         className="btn-outline"
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontSize: '0.8rem' }}
       >
-        🗺️ Abrir no Maps
+        Abrir no Google Maps
       </button>
 
       <button
@@ -43,16 +42,11 @@ export default function BotoesControleViagem({ roteiro }) {
         onClick={handleCompartilharWhatsApp}
         className="btn-outline"
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.4rem',
-          fontSize: '0.8rem',
-          color: '#22c55e',
-          borderColor: '#22c55e',
+          color: 'var(--accent-secondary)',
+          borderColor: 'var(--accent-secondary)',
         }}
       >
-        💬 WhatsApp
+        Compartilhar no WhatsApp
       </button>
 
       <button
@@ -60,16 +54,11 @@ export default function BotoesControleViagem({ roteiro }) {
         onClick={handleDownloadGPX}
         className="btn-outline"
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.4rem',
-          fontSize: '0.8rem',
           color: 'var(--accent-primary)',
           borderColor: 'var(--accent-primary)',
         }}
       >
-        📥 Baixar GPX 1.1
+        Exportar Trilha GPX 1.1
       </button>
     </div>
   );

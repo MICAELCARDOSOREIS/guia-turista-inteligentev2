@@ -21,8 +21,8 @@ export default function RoteiroForm({ onSubmit, carregando }) {
   const [precoUnidade, setPrecoUnidade] = useState(5.89);
   const [diasEstadia, setDiasEstadia] = useState(3);
   const [estiloViagem, setEstiloViagem] = useState('Cultural');
-  const [preferenciaRota, setPreferenciaRota] = useState('tempo');
-  
+  const [preferenciaRota] = useState('tempo');
+
   const [destinosProximos, setDestinosProximos] = useState([]);
   const [buscandoGps, setBuscandoGps] = useState(false);
 
@@ -62,38 +62,61 @@ export default function RoteiroForm({ onSubmit, carregando }) {
     setDestinoUf(dest.uf);
   };
 
+  const autonomiaNominalKm = Math.round((parseFloat(consumoMedio) || 0) * (parseFloat(capacidade) || 0));
+  const autonomiaSeguraKm = Math.round(autonomiaNominalKm * 0.82);
+
   return (
     <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2 style={{ fontSize: '1.15rem', fontWeight: 700 }}>🚗 Planejar Viagem</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1rem' }}>
+        <div>
+          <h2 className="font-display" style={{ fontSize: '1.25rem', fontWeight: 700 }}>
+            Carta de Navegação
+          </h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
+            Defina trecho rodoviário, telemetria veicular e estadia
+          </p>
+        </div>
         <button
           type="button"
           onClick={handleDetectarGps}
           className="btn-outline"
           disabled={buscandoGps}
-          title="Buscar destinos mais próximos com base na fórmula de Haversine"
-          style={{ fontSize: '0.75rem', padding: '0.35rem 0.65rem' }}
+          title="Calcular destinos mais próximos pela distância geodésica de Haversine"
+          style={{ fontSize: '0.75rem', padding: '0.4rem 0.65rem', whiteSpace: 'nowrap' }}
         >
-          {buscandoGps ? 'GPS Ativo...' : '📍 GPS Proximidade'}
+          {buscandoGps ? 'Localizando...' : 'Raio GPS'}
         </button>
       </div>
 
-      {/* Sugestões Haversine */}
       {destinosProximos.length > 0 && (
-        <div style={{ marginBottom: '1.25rem', background: 'var(--bg-secondary)', padding: '0.75rem', borderRadius: 'var(--radius-sm)' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-            Destinos por Raio Geodésico (Haversine):
-          </span>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginTop: '0.4rem' }}>
+        <div
+          style={{
+            marginBottom: '1.2rem',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-color)',
+            padding: '0.85rem',
+            borderRadius: 'var(--radius-sm)',
+          }}
+        >
+          <div style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+            Destinos por distância geodésica (Haversine)
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {destinosProximos.map((d) => (
               <button
                 key={d.cidade}
                 type="button"
-                className="btn-outline"
-                style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                className="btn-outline font-mono"
+                style={{ fontSize: '0.74rem', padding: '0.3rem 0.6rem' }}
                 onClick={() => handleSelecionarDestinoSugerido(d)}
               >
-                {d.cidade} ({d.distancia_km} km) {d.requer_paradas ? '⚠️ >400km' : ''}
+                <span>{d.cidade}-{d.uf}</span>
+                <span style={{ color: 'var(--accent-primary)' }}>{d.distancia_km} km</span>
+                {d.requer_paradas && (
+                  <span style={{ color: 'var(--accent-danger)' }} title="Exige parada obrigatória (> 400 km)">
+                    • &gt;400km
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -101,71 +124,69 @@ export default function RoteiroForm({ onSubmit, carregando }) {
       )}
 
       <form onSubmit={handleSubmit}>
-        {/* Origem e Destino */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: '0.5rem' }}>
-          <div className="form-group">
-            <label htmlFor="origemCidade" className="form-label">Município de Origem</label>
-            <input
-              id="origemCidade"
-              type="text"
-              className="form-input"
-              value={origemCidade}
-              onChange={(e) => setOrigemCidade(e.target.value)}
-              required
-            />
+        <div className="route-connector-box">
+          <span className="route-node-dot" style={{ top: '1.9rem' }} aria-hidden="true" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 82px', gap: '0.55rem' }}>
+            <div className="form-group">
+              <label htmlFor="origemCidade" className="form-label">Município de Origem</label>
+              <input
+                id="origemCidade"
+                type="text"
+                className="form-input"
+                value={origemCidade}
+                onChange={(e) => setOrigemCidade(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="origemUf" className="form-label">UF de Origem</label>
+              <input
+                id="origemUf"
+                type="text"
+                maxLength={2}
+                className="form-input font-mono"
+                value={origemUf}
+                onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="origemUf" className="form-label">UF de Origem</label>
-            <input
-              id="origemUf"
-              type="text"
-              maxLength={2}
-              className="form-input"
-              value={origemUf}
-              onChange={(e) => setOrigemUf(e.target.value.toUpperCase())}
-              required
-            />
+
+          <span className="route-node-dot dest" style={{ bottom: '1.3rem' }} aria-hidden="true" />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 82px', gap: '0.55rem' }}>
+            <div className="form-group" style={{ marginBottom: '0.2rem' }}>
+              <label htmlFor="destinoCidade" className="form-label">Município de Destino</label>
+              <input
+                id="destinoCidade"
+                type="text"
+                className="form-input"
+                value={destinoCidade}
+                onChange={(e) => setDestinoCidade(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group" style={{ marginBottom: '0.2rem' }}>
+              <label htmlFor="destinoUf" className="form-label">UF de Destino</label>
+              <input
+                id="destinoUf"
+                type="text"
+                maxLength={2}
+                className="form-input font-mono"
+                value={destinoUf}
+                onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px', gap: '0.5rem' }}>
-          <div className="form-group">
-            <label htmlFor="destinoCidade" className="form-label">Município de Destino</label>
-            <input
-              id="destinoCidade"
-              type="text"
-              className="form-input"
-              value={destinoCidade}
-              onChange={(e) => setDestinoCidade(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="destinoUf" className="form-label">UF de Destino</label>
-            <input
-              id="destinoUf"
-              type="text"
-              maxLength={2}
-              className="form-input"
-              value={destinoUf}
-              onChange={(e) => setDestinoUf(e.target.value.toUpperCase())}
-              required
-            />
-          </div>
-        </div>
+        <div className="form-section-divider">Motorização e Autonomia</div>
 
-        {/* Tipo de Motor / Propulsão */}
         <div className="form-group">
-          <label className="form-label">Tipo de Propulsão</label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+          <div className="propulsion-toggle" role="group" aria-label="Tipo de Propulsão">
             <button
               type="button"
-              className="btn-outline"
-              style={{
-                borderColor: tipoPropulsao === 'combustao' ? 'var(--accent-primary)' : 'var(--border-color)',
-                background: tipoPropulsao === 'combustao' ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-                fontWeight: tipoPropulsao === 'combustao' ? '700' : '400',
-              }}
+              className={`propulsion-option ${tipoPropulsao === 'combustao' ? 'active-combustao' : ''}`}
               onClick={() => {
                 setTipoPropulsao('combustao');
                 setConsumoMedio(12.0);
@@ -177,12 +198,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
             </button>
             <button
               type="button"
-              className="btn-outline"
-              style={{
-                borderColor: tipoPropulsao === 'ev' ? 'var(--accent-secondary)' : 'var(--border-color)',
-                background: tipoPropulsao === 'ev' ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                fontWeight: tipoPropulsao === 'ev' ? '700' : '400',
-              }}
+              className={`propulsion-option ${tipoPropulsao === 'ev' ? 'active-ev' : ''}`}
               onClick={() => {
                 setTipoPropulsao('ev');
                 setConsumoMedio(6.5);
@@ -195,8 +211,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
           </div>
         </div>
 
-        {/* Parâmetros do Veículo */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
           <div className="form-group">
             <label htmlFor="consumoMedio" className="form-label">
               {tipoPropulsao === 'ev' ? 'Eficiência (km/kWh)' : 'Consumo (km/l)'}
@@ -207,7 +222,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
               step="0.1"
               min="1"
               max="50"
-              className="form-input"
+              className="form-input font-mono"
               value={consumoMedio}
               onChange={(e) => setConsumoMedio(e.target.value)}
               required
@@ -223,7 +238,7 @@ export default function RoteiroForm({ onSubmit, carregando }) {
               step="1"
               min="10"
               max="200"
-              className="form-input"
+              className="form-input font-mono"
               value={capacidade}
               onChange={(e) => setCapacidade(e.target.value)}
               required
@@ -231,47 +246,67 @@ export default function RoteiroForm({ onSubmit, carregando }) {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0.5rem 0.75rem',
+            marginBottom: '0.85rem',
+            background: 'var(--bg-secondary)',
+            borderRadius: 'var(--radius-xs)',
+            border: '1px solid var(--border-color)',
+            fontSize: '0.76rem',
+          }}
+        >
+          <span style={{ color: 'var(--text-secondary)' }}>Alcance útil (reserva 18%):</span>
+          <strong className="font-mono" style={{ color: 'var(--accent-secondary)' }}>
+            {autonomiaSeguraKm} km <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>/ {autonomiaNominalKm} km máx</span>
+          </strong>
+        </div>
+
+        <div className="form-section-divider">Estadia e Curadoria Cultural</div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
           <div className="form-group">
-            <label htmlFor="diasEstadia" className="form-label">Duração (Dias)</label>
+            <label htmlFor="diasEstadia" className="form-label">Duração no Destino</label>
             <select
               id="diasEstadia"
               className="form-select"
               value={diasEstadia}
               onChange={(e) => setDiasEstadia(e.target.value)}
             >
-              <option value="1">1 Dia (Bate-Volta)</option>
-              <option value="2">2 Dias (Fim de Semana)</option>
-              <option value="3">3 Dias (Feriado)</option>
-              <option value="4">4 Dias (Extenso)</option>
-              <option value="5">5 Dias (Semana)</option>
+              <option value="1">1 dia (bate-volta)</option>
+              <option value="2">2 dias (fim de semana)</option>
+              <option value="3">3 dias (feriado)</option>
+              <option value="4">4 dias (imersão)</option>
+              <option value="5">5 dias (expedição)</option>
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="estiloViagem" className="form-label">Perfil do Viajante</label>
+            <label htmlFor="estiloViagem" className="form-label">Foco do Roteiro</label>
             <select
               id="estiloViagem"
               className="form-select"
               value={estiloViagem}
               onChange={(e) => setEstiloViagem(e.target.value)}
             >
-              <option value="Cultural">Cultural</option>
-              <option value="Gastronômico">Gastronômico</option>
-              <option value="Ecoturismo">Ecoturismo</option>
-              <option value="Família">Família</option>
-              <option value="Romântico">Romântico</option>
+              <option value="Cultural">Histórico & Cultural</option>
+              <option value="Gastronômico">Rota Gastronômica</option>
+              <option value="Ecoturismo">Natureza & Ecoturismo</option>
+              <option value="Família">Lazer em Família</option>
+              <option value="Romântico">Refúgio & Charme</option>
             </select>
           </div>
         </div>
 
-        {/* Botão com bloqueio idempotente */}
         <button
           type="submit"
           className="btn-primary"
           disabled={carregando}
-          style={{ marginTop: '0.75rem' }}
+          style={{ marginTop: '0.5rem' }}
         >
-          {carregando ? '⏳ Processando Rota & IA...' : '🚀 Planejar Roteiro Inteligente'}
+          {carregando ? 'Processando Rota, Relevo & IA...' : 'Traçar Rota e Gerar Guia'}
         </button>
       </form>
     </div>

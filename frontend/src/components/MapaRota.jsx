@@ -10,8 +10,8 @@ export default function MapaRota({ roteiro, userId }) {
   const markersLayer = useRef(null);
 
   const [sugestaoSelecionada, setSugestaoSelecionada] = useState('rota_1');
-  const [sanfonaAberta, setSanfonaAberta] = useState(false);
-  const [passageiros, setPassageiros] = useState(1);
+  const [sanfonaAberta, setSanfonaAberta] = useState(true);
+  const [passageiros, setPassageiros] = useState(2);
   const [custosAtuais, setCustosAtuais] = useState(null);
 
   useEffect(() => {
@@ -19,7 +19,6 @@ export default function MapaRota({ roteiro, userId }) {
     setCustosAtuais(roteiro.custos);
   }, [roteiro]);
 
-  // Recalcula custos quando muda número de passageiros
   useEffect(() => {
     if (!roteiro) return;
     const atualizarCustos = async () => {
@@ -40,7 +39,6 @@ export default function MapaRota({ roteiro, userId }) {
     atualizarCustos();
   }, [passageiros, roteiro, userId]);
 
-  // Inicializa mapa Leaflet
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -63,19 +61,17 @@ export default function MapaRota({ roteiro, userId }) {
 
     const coords = roteiro.rota.coordinates.map((c) => [c[1], c[0]]);
 
-    // Desenha traçado da rodovia
     const polyline = L.polyline(coords, {
-      color: '#0284c7',
+      color: '#E09F3E',
       weight: 5,
-      opacity: 0.85,
+      opacity: 0.92,
     }).addTo(polylineLayer.current);
 
-    map.fitBounds(polyline.getBounds(), { padding: [30, 30] });
+    map.fitBounds(polyline.getBounds(), { padding: [34, 34] });
 
-    // Marcadores de Origem e Destino
     if (coords.length > 0) {
       L.marker(coords[0])
-        .bindPopup(`<b>Partida:</b> ${roteiro.origem}`)
+        .bindPopup(`<b>Origem:</b> ${roteiro.origem}`)
         .addTo(markersLayer.current);
 
       L.marker(coords[coords.length - 1])
@@ -83,19 +79,18 @@ export default function MapaRota({ roteiro, userId }) {
         .addTo(markersLayer.current);
     }
 
-    // Marcadores de postos por autonomia
     if (roteiro.paradas_recarga) {
       roteiro.paradas_recarga.forEach((p) => {
         const iconeHtml = p.tipo.includes('Eletroposto') ? '⚡' : '⛽';
         const customIcon = L.divIcon({
           className: 'custom-map-icon',
-          html: `<div style="background:var(--bg-secondary); border:2px solid var(--accent-warning); border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:var(--shadow-md);">${iconeHtml}</div>`,
-          iconSize: [28, 28],
+          html: `<div style="background:var(--bg-secondary); border:2px solid var(--accent-primary); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:var(--shadow-md);">${iconeHtml}</div>`,
+          iconSize: [30, 30],
         });
 
         L.marker([p.lat, p.lon], { icon: customIcon })
           .bindPopup(
-            `<b>${p.nome}</b><br/>${p.tipo}<br/>Tempo estimado: ${p.tempo_estimado_min} min<br/>Margem reserva: ${p.reserva_restante_pct}%`
+            `<b>${p.nome}</b><br/>${p.tipo}<br/>Parada estimada: ${p.tempo_estimado_min} min<br/>Reserva no ponto: ${p.reserva_restante_pct}%`
           )
           .addTo(markersLayer.current);
       });
@@ -104,178 +99,271 @@ export default function MapaRota({ roteiro, userId }) {
 
   if (!roteiro) {
     return (
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 380, textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-          🗺️ Preencha os parâmetros e clique em <b>Planejar Roteiro</b> para renderizar o mapa interativo, altimetria e postos estratégicos.
-        </p>
+      <div
+        className="card"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          minHeight: 430,
+          background:
+            'radial-gradient(circle at 80% 20%, rgba(46, 196, 182, 0.12), transparent 55%), var(--bg-card)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <span className="badge badge-info">Carta Cartográfica OSRM + Open-Elevation</span>
+          <span className="font-mono" style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
+            DATUM SIRGAS 2000 • ESCALA DINÂMICA
+          </span>
+        </div>
+
+        <div style={{ maxWidth: '58ch', margin: '2rem 0' }}>
+          <h2 className="font-display" style={{ fontSize: '1.85rem', fontWeight: 700, lineHeight: 1.2, marginBottom: '0.75rem' }}>
+            Planejamento rodoviário com altimetria real, reserva de autonomia e guia em tempo real.
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.96rem' }}>
+            Informe o município de partida e o destino ao lado para calcular a malha viária via OSRM,
+            a penalização altimétrica na subida da serra, os postos ou eletropostos ao longo da rodovia
+            e o roteiro cultural transmitido via Server-Sent Events (SSE).
+          </p>
+        </div>
+
+        <div className="odometer-strip">
+          <div className="odometer-cell">
+            <span className="odometer-label">Corredor Litorâneo</span>
+            <span className="odometer-value">Teresina → Parnaíba</span>
+          </div>
+          <div className="odometer-cell">
+            <span className="odometer-label">Serra da Ibiapaba</span>
+            <span className="odometer-value">Teresina → Pedro II</span>
+          </div>
+          <div className="odometer-cell">
+            <span className="odometer-label">Rota das Emoções</span>
+            <span className="odometer-value">Parnaíba → Jericoacoara</span>
+          </div>
+        </div>
       </div>
     );
   }
 
   const { rota, altimetria, custos } = roteiro;
   const custosExibicao = custosAtuais || custos;
+  const coordPartida = rota.coordinates?.[0];
+  const coordChegada = rota.coordinates?.[rota.coordinates.length - 1];
 
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      {/* Badges de Destaque Métrico */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
-        <span className="badge badge-info" style={{ fontSize: '0.85rem' }}>
-          🛣️ {rota.distancia_km} km
-        </span>
-        <span className="badge badge-success" style={{ fontSize: '0.85rem' }}>
-          ⏱️ {rota.duracao_formatada}
-        </span>
-        <span className="badge badge-warning" style={{ fontSize: '0.85rem' }}>
-          ⛽ {roteiro.paradas_recarga?.length || 0} Paradas Sugeridas
-        </span>
-        <span className="badge badge-info" style={{ fontSize: '0.85rem' }}>
-          ⛰️ Desnível: {altimetria?.desnivel_liquido_m > 0 ? `+${altimetria.desnivel_liquido_m}m` : `${altimetria?.desnivel_liquido_m}m`}
+    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.5rem' }}>
+        <div>
+          <h2 className="font-display" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+            {roteiro.origem} → {roteiro.destino}
+          </h2>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+            Traçado rodoviário calculado com margem de segurança energética de 18%
+          </span>
+        </div>
+        <span className="badge badge-success">
+          {roteiro.paradas_recarga?.length || 0} {roteiro.paradas_recarga?.length === 1 ? 'parada estratégica' : 'paradas estratégicas'}
         </span>
       </div>
 
-      {/* Abas de Rotas Alternativas */}
+      {/* Hodômetro de Telemetria da Viagem */}
+      <div className="odometer-strip">
+        <div className="odometer-cell">
+          <span className="odometer-label">Extensão do Trecho</span>
+          <span className="odometer-value">{rota.distancia_km} km</span>
+        </div>
+        <div className="odometer-cell">
+          <span className="odometer-label">Tempo de Condução</span>
+          <span className="odometer-value">{rota.duracao_formatada}</span>
+        </div>
+        <div className="odometer-cell">
+          <span className="odometer-label">Desnível Líquido</span>
+          <span className="odometer-value">
+            {altimetria?.desnivel_liquido_m > 0 ? `+${altimetria.desnivel_liquido_m} m` : `${altimetria?.desnivel_liquido_m} m`}
+          </span>
+        </div>
+        <div className="odometer-cell">
+          <span className="odometer-label">Impacto do Relevo</span>
+          <span className="odometer-value" style={{ color: 'var(--accent-primary)' }}>
+            +{altimetria?.penalizacao_consumo_pct || 0}%
+          </span>
+        </div>
+      </div>
+
+      {/* Opções de Traçado */}
       {rota.rotas_alternativas && (
-        <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-          {rota.rotas_alternativas.map((alt) => (
-            <button
-              key={alt.id}
-              type="button"
-              className="btn-outline"
-              style={{
-                borderColor: sugestaoSelecionada === alt.id ? 'var(--accent-primary)' : 'var(--border-color)',
-                background: sugestaoSelecionada === alt.id ? 'var(--bg-tertiary)' : 'transparent',
-                fontWeight: sugestaoSelecionada === alt.id ? 700 : 400,
-                fontSize: '0.85rem',
-              }}
-              onClick={() => setSugestaoSelecionada(alt.id)}
-            >
-              {alt.nome} ({alt.distancia_km} km • {alt.duracao_min} min)
-            </button>
-          ))}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {rota.rotas_alternativas.map((alt) => {
+            const ativa = sugestaoSelecionada === alt.id;
+            return (
+              <button
+                key={alt.id}
+                type="button"
+                className="btn-outline"
+                style={{
+                  borderColor: ativa ? 'var(--accent-primary)' : 'var(--border-color)',
+                  background: ativa ? 'var(--bg-elevated)' : 'var(--bg-secondary)',
+                  color: ativa ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                }}
+                onClick={() => setSugestaoSelecionada(alt.id)}
+              >
+                <span>{alt.nome}</span>
+                <span className="font-mono" style={{ fontSize: '0.76rem' }}>
+                  {alt.distancia_km} km • {alt.duracao_min} min
+                </span>
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Container Leaflet */}
-      <div ref={mapRef} className="map-container" />
+      {/* Mapa Interativo com Overlay de Coordenadas */}
+      <div className="map-frame">
+        <div ref={mapRef} className="map-container" />
+        {coordPartida && coordChegada && (
+          <div className="map-coordinates-overlay">
+            ORIG {coordPartida[1].toFixed(3)}°, {coordPartida[0].toFixed(3)}° • DEST {coordChegada[1].toFixed(3)}°, {coordChegada[0].toFixed(3)}°
+          </div>
+        )}
+      </div>
 
-      {/* Ações Rápidas: Maps, WhatsApp e GPX */}
       <BotoesControleViagem roteiro={roteiro} />
 
-      {/* Sanfona de Topografia & Relevo */}
+      {/* Corte Altimétrico SVG Contínuo */}
       <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
         <button
           type="button"
           onClick={() => setSanfonaAberta(!sanfonaAberta)}
           style={{
             width: '100%',
-            padding: '0.75rem 1rem',
+            padding: '0.8rem 1rem',
             background: 'var(--bg-secondary)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             fontWeight: 600,
-            fontSize: '0.9rem',
+            fontSize: '0.88rem',
             color: 'var(--text-primary)',
           }}
         >
-          <span>⛰️ Perfil Topográfico & Altimetria (Open-Elevation)</span>
-          <span>{sanfonaAberta ? '▲ Recolher' : '▼ Expandir'}</span>
+          <span>Corte Topográfico e Altimetria da Rodovia (Open-Elevation)</span>
+          <span className="font-mono" style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            {sanfonaAberta ? 'Ocultar ▲' : 'Inspecionar ▼'}
+          </span>
         </button>
 
         {sanfonaAberta && (
-          <div style={{ padding: '1rem', background: 'var(--bg-card)' }}>
+          <div style={{ padding: '1.1rem', background: 'var(--bg-card)' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '1rem' }}>
               <div>
-                <small style={{ color: 'var(--text-secondary)' }}>Ganho de Subida:</small>
-                <div style={{ fontWeight: 700, color: 'var(--accent-danger)' }}>+{altimetria?.ganho_elevacao_m} m</div>
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Ganho Acumulado</small>
+                <div className="font-mono" style={{ fontWeight: 700, color: 'var(--accent-danger)' }}>
+                  +{altimetria?.ganho_elevacao_m} m
+                </div>
               </div>
               <div>
-                <small style={{ color: 'var(--text-secondary)' }}>Perda de Descida:</small>
-                <div style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>-{altimetria?.perda_elevacao_m} m</div>
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Descida Acumulada</small>
+                <div className="font-mono" style={{ fontWeight: 700, color: 'var(--accent-secondary)' }}>
+                  -{altimetria?.perda_elevacao_m} m
+                </div>
               </div>
               <div>
-                <small style={{ color: 'var(--text-secondary)' }}>Altitude Máxima:</small>
-                <div style={{ fontWeight: 700 }}>{altimetria?.altitude_maxima_m} m</div>
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Cota de Topo</small>
+                <div className="font-mono" style={{ fontWeight: 700 }}>
+                  {altimetria?.altitude_maxima_m} m
+                </div>
               </div>
               <div>
-                <small style={{ color: 'var(--text-secondary)' }}>Penalização Consumo:</small>
-                <div style={{ fontWeight: 700, color: 'var(--accent-warning)' }}>+{altimetria?.penalizacao_consumo_pct}%</div>
+                <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Ajuste Energético</small>
+                <div className="font-mono" style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>
+                  +{altimetria?.penalizacao_consumo_pct}% consumo
+                </div>
               </div>
             </div>
 
-            {/* Mini gráfico visual de altimetria */}
-            <div style={{ display: 'flex', alignItems: 'flex-end', height: 70, gap: 4, background: 'var(--bg-secondary)', padding: '6px', borderRadius: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-end', height: 82, gap: 5, background: 'var(--bg-secondary)', padding: '10px 8px 6px', borderRadius: 8 }}>
               {altimetria?.perfil?.map((p, idx) => {
                 const max = altimetria.altitude_maxima_m || 300;
-                const alturaBarra = Math.max((p.elevacao / max) * 100, 15);
+                const alturaBarra = Math.max((p.elevacao / max) * 100, 14);
                 return (
                   <div
                     key={idx}
-                    title={`Km ${p.km}: ${p.elevacao}m`}
+                    title={`Km ${p.km}: ${p.elevacao}m de altitude`}
                     style={{
                       flex: 1,
                       height: `${alturaBarra}%`,
-                      background: 'var(--accent-primary)',
-                      opacity: 0.8,
-                      borderRadius: '2px 2px 0 0',
+                      background: 'linear-gradient(180deg, var(--accent-primary) 0%, rgba(224, 159, 62, 0.25) 100%)',
+                      borderRadius: '3px 3px 0 0',
                     }}
                   />
                 );
               })}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 4 }}>
-              <span>Partida (0 km)</span>
-              <span>Metade do Trajeto</span>
-              <span>Chegada ({rota.distancia_km} km)</span>
+            <div className="font-mono" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 6 }}>
+              <span>KM 0 ({roteiro.origem.split('-')[0].trim()})</span>
+              <span>TRECHO INTERMEDIÁRIO</span>
+              <span>KM {rota.distancia_km} ({roteiro.destino.split('-')[0].trim()})</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Painel de Custos & Rateio */}
-      <div style={{ background: 'var(--bg-secondary)', padding: '1rem', borderRadius: 'var(--radius-sm)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>💰 Estimativa de Despesas & Rateio</h3>
+      <div style={{ background: 'var(--bg-secondary)', padding: '1.15rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.9rem' }}>
+          <div>
+            <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700 }}>
+              Orçamento Rodoviário & Rateio
+            </h3>
+            <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
+              Inclui combustível/recarga corrigidos pelo relevo e estimativa de pedágios
+            </span>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <label htmlFor="passageirosInput" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Passageiros:
+            <label htmlFor="passageirosInput" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+              Ocupantes:
             </label>
             <select
               id="passageirosInput"
-              className="form-select"
-              style={{ width: 'auto', padding: '0.2rem 0.5rem' }}
+              className="form-select font-mono"
+              style={{ width: 'auto', padding: '0.3rem 0.65rem' }}
               value={passageiros}
               onChange={(e) => setPassageiros(parseInt(e.target.value, 10))}
             >
               {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                 <option key={n} value={n}>
-                  {n} {n === 1 ? 'viajante' : 'viajantes'}
+                  {n} {n === 1 ? 'ocupante' : 'ocupantes'}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
-          <div>
-            <small style={{ color: 'var(--text-secondary)' }}>Energia/Combustível:</small>
-            <div style={{ fontWeight: 600 }}>R$ {custosExibicao?.custo_combustivel_ou_energia?.toFixed(2)}</div>
+        <div className="odometer-strip">
+          <div className="odometer-cell" style={{ background: 'var(--bg-card)' }}>
+            <span className="odometer-label">Abastecimento / Recarga</span>
+            <span className="odometer-value" style={{ fontSize: '1.05rem' }}>
+              R$ {custosExibicao?.custo_combustivel_ou_energia?.toFixed(2)}
+            </span>
           </div>
-          <div>
-            <small style={{ color: 'var(--text-secondary)' }}>Pedágios Previstos:</small>
-            <div style={{ fontWeight: 600 }}>R$ {custosExibicao?.custo_pedagios?.toFixed(2)}</div>
+          <div className="odometer-cell" style={{ background: 'var(--bg-card)' }}>
+            <span className="odometer-label">Praças de Pedágio</span>
+            <span className="odometer-value" style={{ fontSize: '1.05rem' }}>
+              R$ {custosExibicao?.custo_pedagios?.toFixed(2)}
+            </span>
           </div>
-          <div>
-            <small style={{ color: 'var(--text-secondary)' }}>Custo Total:</small>
-            <div style={{ fontWeight: 700, color: 'var(--accent-primary)', fontSize: '1.05rem' }}>
+          <div className="odometer-cell" style={{ background: 'var(--bg-card)' }}>
+            <span className="odometer-label">Custo Total do Trecho</span>
+            <span className="odometer-value" style={{ fontSize: '1.1rem', color: 'var(--accent-primary)' }}>
               R$ {custosExibicao?.custo_total?.toFixed(2)}
-            </div>
+            </span>
           </div>
-          <div style={{ background: 'var(--bg-tertiary)', padding: '0.4rem 0.6rem', borderRadius: 4 }}>
-            <small style={{ color: 'var(--text-secondary)' }}>Cota Individual ({passageiros}x):</small>
-            <div style={{ fontWeight: 800, color: 'var(--accent-secondary)', fontSize: '1.15rem' }}>
+          <div className="odometer-cell" style={{ background: 'var(--bg-elevated)', borderColor: 'var(--accent-secondary)' }}>
+            <span className="odometer-label">Rateio por Pessoa ({passageiros}x)</span>
+            <span className="odometer-value" style={{ fontSize: '1.15rem', color: 'var(--accent-secondary)' }}>
               R$ {custosExibicao?.custo_por_passageiro?.toFixed(2)}
-            </div>
+            </span>
           </div>
         </div>
       </div>
