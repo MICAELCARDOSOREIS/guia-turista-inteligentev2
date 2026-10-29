@@ -1,5 +1,7 @@
 # Ambientes virtuais e Python
+.venv
 .venv/
+backend/.venv
 venv/
 __pycache__/
 *.pyc
@@ -9,7 +11,9 @@ __pycache__/
 *.tmp
 
 # Node e Front-end
+node_modules
 node_modules/
+frontend/node_modules
 **/node_modules/
 dist/
 frontend/dist/
@@ -21,7 +25,8 @@ frontend/.vite/
 backend/.env
 frontend/.env
 
-# Superpowers e logs
+# Superpowers, gstack e logs
 .superpowers/sdd/
+.gstack/
 .DS_Store
 *.log
